@@ -7,20 +7,20 @@
       <el-button type="primary" @click='add'><i class="el-icon-plus"></i>  新建</el-button>
     </div>
     <div>
-      <div class='tip'><i class="el-icon-info"></i> 全部账号<span class='color'>{{tableData.length}}</span>号 </div>
+      <div class='tip'><i class="el-icon-info"></i> 全部账号<span class='color'>{{tableData.length}}</span>项 </div>
       <el-table
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="date"
+        prop="accountLoginName"
         label="账号">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="password"
         label="密码">
       </el-table-column>
       <el-table-column
-        prop="address"
+        prop="createDatetime"
         label="更新时间">
       </el-table-column>
       <el-table-column
@@ -32,22 +32,32 @@
       </el-table-column>
     </el-table>
     </div>
-
-    <el-dialog title="新增" :visible.sync="isShow">
-      <el-form :model="form">
-        <el-form-item label="账号" label-width="120px">
-          <el-input v-model="form.name" placeholder="输入账号"></el-input>
+    <div class='pages'>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="1"
+        :page-sizes="[10, 20, 50]"
+        :page-size="pageSize"
+        layout="total, prev, pager, next ,sizes, jumper"
+        :total="total">
+      </el-pagination>
+    </div>
+    <el-dialog title="新增" :visible.sync="isShow" width='500px'>
+      <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="账号" prop="accountLoginName">
+          <el-input v-model="ruleForm.accountLoginName"></el-input>
         </el-form-item>
-        <el-form-item label="密码" label-width="120px">
-          <el-input v-model="form.name" placeholder='输入密码'></el-input>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="ruleForm.password" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="确认密码" label-width="120px">
-          <el-input v-model="form.name" placeholder='确认密码'></el-input>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input type="password" v-model="ruleForm.confirmPassword" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShow = false">取 消</el-button>
-        <el-button type="primary" @click="isShow = false">确 定</el-button>
+        <el-button type="primary" @click="sumbit('ruleForm')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -55,19 +65,59 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import $http from '@/pc/api/event';
+import Component from 'vue-class-component';
 
 
+@Component({
+})
 export default class Account extends Vue {
-  tableData: Array<any> = [1,2,3]
+  tableData: Array<any> = []
   account: String = ''
-  form: any = {}
+  ruleForm: any = {}
   isShow: Boolean = false
+  pageSize: Number = 10
+  total: Number = 0
+  pageIndex: Number = 1
+  validatePass = (rule, value, callback) => {
+    if (value === '') {
+      callback(new Error('请输入密码'));
+    } else {
+      if (this.ruleForm.confirmPassword !== '') {
+        this.$refs.ruleForm.validateField('confirmPassword');
+      }
+      callback();
+    }
+  }
+  validatePass2 = (rule, value, callback) => {
+    if (value === '') {
+      callback(new Error('请再次输入密码'));
+    } else if (value !== this.ruleForm.password) {
+      callback(new Error('两次输入密码不一致!'));
+    } else {
+      callback();
+    }
+  }
+  rules = {
+    password: [
+      { required: true, validator: this.validatePass, trigger: 'blur' }
+    ],
+    confirmPassword: [
+      { required: true, validator: this.validatePass2, trigger: 'blur' }
+    ],
+    accountLoginName: [
+      { required: true, message: '请输入账号', trigger: 'blur' }
+    ]
+  }
   reset(item){
-    console.log(this)
-    this.$message({
-      message: '重置成功',
-      type: 'success'
-    });
+    $http.resetPassword({...item})
+    .then(res => {
+      this.$message({
+        message: '重置成功',
+        type: 'success'
+      });
+    })
+    
   }
   del(item){
     this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
@@ -75,10 +125,14 @@ export default class Account extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      this.$message({
-        type: 'success',
-        message: '删除成功!'
-      });
+      $http.accountDel({...item})
+      .then(res => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+      })
+     
     }).catch(() => {
       this.$message({
         type: 'info',
@@ -90,8 +144,44 @@ export default class Account extends Vue {
     console.log(this)
     this.isShow=true
   }
+  getList(){
+    $http.accountList({
+      	pageIndex: 1,
+        pageSize: this.	pageSize
+    })
+    .then(res => {
+      this.tableData = res.data
+      this.total = res.totalElements
+    })
+  }
+  handleSizeChange(val){
+    this.pageSize = val
+    this.getList()
+  }
+  handleCurrentChange(val){
+    this.pageIndex = val
+    this.getList()
+  }
+  sumbit(formName){
+    this.$refs[formName].validate((valid) => {
+      if (valid) {
+        $http.accountAdd({...this.ruleForm})
+        .then(res => {
+          this.$message({
+            message: '新增成功',
+            type: 'success'
+          });
+          this.getList()
+          this.isShow = false
+        })
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
+  }
   mounted() {
-    
+    this.getList()
   }
 
 }
@@ -120,6 +210,11 @@ export default class Account extends Vue {
   }
   .mb_20{
     margin-bottom: 20px;
+  }
+  .pages{
+    padding: 0px 19px;
+    margin: 34px 0px;
+    text-align: right;
   }
 }
 </style>

@@ -6,7 +6,7 @@
       width="100"
       trigger="click">
       <div class='mb_20' @click='isShow = true'><i class='el-icon-s-tools'></i>  修改密码</div>
-      <div @click='isShow = true'><i class='el-icon-switch-button'></i>  安全退出</div>
+      <div @click='logout'><i class='el-icon-switch-button'></i>  安全退出</div>
       <div slot="reference" class='cursor_pointer'>用户名</div>
     </el-popover>
     </div>
@@ -33,11 +33,19 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import $http from '@/pc/api/event';
 
 @Component({})
 export default class MenuHeader extends Vue {
   isShow: Boolean = false
   form: any = {}
+  logout(){
+    $http.logout()
+    .then(res => {
+      localStorage.removeItem("accountId")
+      this.$router.push({name: 'login'})
+    })
+  }
 }
 </script>
 <style scoped lang="scss">

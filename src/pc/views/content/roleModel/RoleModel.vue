@@ -11,7 +11,7 @@
       <el-tab-pane label="优秀组工干部" name="8"></el-tab-pane>
 
     </el-tabs>
-    <my-list :list='list' @add='add' @edit='edit' @del='del'></my-list>
+    <my-list :list='list' name='roleModelEdit' :type='activeName' @del='del'></my-list>
 
   </div>
 </template>
@@ -20,6 +20,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import MyList from '@/pc/components/MyList.vue'
+import $http from '@/pc/api/event';
 
 @Component({
     components:{MyList}
@@ -29,27 +30,40 @@ export default class RoleModel extends Vue {
   activeName: string = '1'
   list: Array<any> = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
   handleClick(){
-  }
-  getList(){
-    // 获取列表
-  }
-  del(item){
-    // 删除
     this.getList()
   }
-  edit(item){
-    let name = 'leaderCareEdit'
-    if (this.activeName == 3) name =  'AddMinister'
-    // 去编辑
-    this.$router.push({name})
+  getList(){
+     // 获取列表
+    $http.powerList(
+      {organizationPowerType: this.activeName, organizationPowerMeunType: 2}
+    )
+    .then(res => {
+      this.list = res.data
+    })
   }
-  add(){
-    let name = 'leaderCareEdit'
-    if (this.activeName == 3) name =  'AddMinister'
-    this.$router.push({name})
+  del(item){
+    this.$confirm('此操作将永久删除该该数据, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      $http.powerDelete({prefaceId: item.prefaceId})
+      .then(res => {
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        });
+        this.getList()
+      })
+    }).catch(() => {       
+    });
   }
-  mounted: {
-    
+  
+
+  mounted() {
+        if(this.$route.query.type)  this.activeName = this.$route.query.type.toString()
+
+    this.getList()
   }
 }
 </script>

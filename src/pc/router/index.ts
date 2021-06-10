@@ -19,7 +19,10 @@ const LeaderCareEdit = () => import(/* webpackChunkName:"LeaderCareEdit" */ '@/p
 const AddMinister = () => import(/* webpackChunkName:"AddMinister" */ '@/pc/views/content/leaderCare/AddMinister.vue');
 
 
+const OrganizeWorkIndex = () => import(/* webpackChunkName:"OrganizeWorkIndex" */ '@/pc/views/content/organizeWork/Index.vue');
 const OrganizeWork = () => import(/* webpackChunkName:"OrganizeWork" */ '@/pc/views/content/organizeWork/OrganizeWork.vue');
+const OrganizeWorkEdit = () => import(/* webpackChunkName:"OrganizeWorkEdit" */ '@/pc/views/content/organizeWork/Edit.vue');
+
 
 const Preface = () => import(/* webpackChunkName:"Preface" */ '@/pc/views/content/preface/Index.vue');
 const Video = () => import(/* webpackChunkName:"Video " */ '@/pc/views/content/preface/Video.vue');
@@ -28,6 +31,8 @@ const PrefaceEdit = () => import(/* webpackChunkName:"PrefaceEdit" */ '@/pc/view
 
 
 const RoleModel = () => import(/* webpackChunkName:"RoleModel" */ '@/pc/views/content/roleModel/RoleModel.vue');
+const RoleModelIndex = () => import(/* webpackChunkName:"RoleModelIndex" */ '@/pc/views/content/roleModel/Index.vue');
+const RoleModelEdit = () => import(/* webpackChunkName:"RoleModelEdit" */ '@/pc/views/content/roleModel/Edit.vue');
 
 const SevenGroupIndex = () => import(/* webpackChunkName:"SevenGroupIndex" */ '@/pc/views/content/sevenGroup/Index.vue');
 const SevenGroupEdit = () => import(/* webpackChunkName:"SevenGroupEdit" */ '@/pc/views/content/sevenGroup/Edit.vue');
@@ -46,6 +51,8 @@ export default new Router({
     {
       path: '/home',
       name: 'home',
+      redirect: '/account',
+
       component: Home,
       children: [
         {
@@ -63,7 +70,7 @@ export default new Router({
                 {
                   path: '/video',
                   name: 'video',
-                  meta: {name: '视频', isShowChildren: true},
+                  meta: {name: '视频/图片', isShowChildren: true},
                   component: Video,
                 },
                 {
@@ -129,20 +136,50 @@ export default new Router({
               ]
             },
             {
-              path: '/organizeWork',
-              name: 'organizeWork',
-              meta: {name: '组织工作', isShowChildren: true},
-              component: OrganizeWork,
+              path: '/organizeWorkIndex',
+              name: 'organizeWorkIndex',
+              redirect: '/OrganizeWork',
+              meta: {name: '组织工作', isShowChildren: false},
+              component: OrganizeWorkIndex,
+              children: [
+                {
+                  path: '/organize-work-edit',
+                  name: 'OrganizeWorkEdit',
+                  meta: {name: '编辑/新增', isShowChildren: false},
+                  component: OrganizeWorkEdit,
+                },
+                {
+                  path: '/OrganizeWork',
+                  name: 'OrganizeWork',
+                  meta: {name: '组织工作', isShowChildren: true},
+                  component: OrganizeWork
+                }
+              ]
             },
             {
-              path: '/roleModel',
-              name: 'roleModel',
-              meta: {name: '榜样力量', isShowChildren: true},
-              component: RoleModel,
+              path: '/roleModel-index',
+              name: 'roleModelIndex',
+              redirect: '/roleModel',
+              meta: {name: '榜样力量', isShowChildren: false},
+              component: RoleModelIndex,
+              children: [
+                {
+                  path: '/roleModel-edit',
+                  name: 'roleModelEdit',
+                  meta: {name: '编辑/新增', isShowChildren: false},
+                  component: RoleModelEdit,
+                },
+                {
+                  path: '/roleModel',
+                  name: 'roleModel',
+                  meta: {name: '榜样力量', isShowChildren: true},
+                  component: RoleModel
+                }
+              ]
             },{
               path: '/seven-group-index',
               name: 'sevenGroupIndex',
-              redirect: '/seven-group-list',
+              redirect: '/ls',
               meta: {name: '七地组声', isShowChildren: true},
               component: SevenGroupIndex,
               children: [
@@ -150,54 +187,48 @@ export default new Router({
                   path: '/seven-group-edit',
                   name: 'SevenGroupEdit',
                   meta: {name: '编辑', isShowChildren: false},
-                  component: SevenGroupList,
-                },
-                {
-                  path: '/seven-group-list',
-                  name: 'SevenGroupList',
-                  meta: {name: '拉萨', isShowChildren: true},
-                  component: SevenGroupList,
+                  component: SevenGroupEdit,
                 },
                 {
                   path: '/ls',
                   name: 'ls',
-                  meta: {name: '拉萨', isShowChildren: true},
+                  meta: {name: '拉萨', isShowChildren: true, type: 1},
                   component: SevenGroupList,
                 },
                 {
                   path: '/rkz',
                   name: 'rkz',
-                  meta: {name: '日喀则', isShowChildren: true},
+                  meta: {name: '日喀则', isShowChildren: true, type: 2},
                   component: SevenGroupList,
                 },
                 {
                   path: '/sn',
                   name: 'sn',
-                  meta: {name: '山南', isShowChildren: true},
+                  meta: {name: '山南', isShowChildren: true, type: 3},
                   component: SevenGroupList,
                 },
                 {
                   path: '/lz',
                   name: 'lz',
-                  meta: {name: '林芝', isShowChildren: true},
+                  meta: {name: '林芝', isShowChildren: true, type: 4},
                   component: SevenGroupList,
                 },
                 {
                   path: '/cd',
                   name: 'cd',
-                  meta: {name: '昌都', isShowChildren: true},
+                  meta: {name: '昌都', isShowChildren: true, type: 5},
                   component: SevenGroupList,
                 },
                 {
                   path: '/nq',
                   name: 'nq',
-                  meta: {name: '那曲', isShowChildren: true},
+                  meta: {name: '那曲', isShowChildren: true, type: 6},
                   component: SevenGroupList,
                 },
                 {
                   path: '/al',
                   name: 'al',
-                  meta: {name: '阿里', isShowChildren: true},
+                  meta: {name: '阿里', isShowChildren: true, type: 7},
                   component: SevenGroupList,
                 },
               ]

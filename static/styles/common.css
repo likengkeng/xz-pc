@@ -16,6 +16,9 @@ body{
 .jc_sb{
   justify-content: space-between;
 }
+.jc_sa{
+  justify-content: space-around;
+}
 .jc_end{
   justify-content: flex-end;
 }

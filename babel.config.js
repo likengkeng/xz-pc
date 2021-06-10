@@ -31,4 +31,5 @@ module.exports = {
     ],
     ["@babel/proposal-decorators", { "legacy": true }],
   ],
+  sourceType: 'unambiguous'
 }

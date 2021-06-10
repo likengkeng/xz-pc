@@ -25,7 +25,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import $http from '@/pc/api/event';
-
+import Component from 'vue-class-component';
+@Component({
+})
 export default class Login extends Vue {
   form: any = {
     name: '', password: ''
@@ -38,6 +40,7 @@ export default class Login extends Vue {
     })
       .then((res) => {
         console.log(res)
+        localStorage.setItem("accountId",res.data.accountId)
         this.$router.push({name: 'home'})
       })
       .catch(() => {

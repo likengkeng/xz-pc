@@ -3,97 +3,279 @@
     <div>
       <el-form ref="form" label-position='right' :model="form" label-width="90px">
         <el-form-item label="发布类型：" class='mb_25'>
-          <el-radio-group v-model="form.type">
+          <el-radio-group v-model="form.articleVO.articleType">
             <el-radio :label="1">文章</el-radio>
             <el-radio :label="2">超链接</el-radio>
           </el-radio-group>
         </el-form-item>
-        <div v-if='form.type == 1'>
+        <div v-if='form.articleVO.articleType == 1'>
           <el-form-item label="选择：" class='mb_25'>
-            <el-button>图片</el-button>
-            <el-button>音频</el-button>
-            <el-button>视频</el-button>
+            <el-button @click='dialogType=1,isShow=true'>图片</el-button>
+            <el-button @click='dialogType=2,isShow=true'>音频</el-button>
+            <el-button @click='dialogType=3,isShow=true'>视频</el-button>
           </el-form-item>
           <el-form-item label="" class='mb_25'>
-            <el-input class='header' v-model="form.input" placeholder="请在这里输入标题"></el-input>
+            <el-input class='header' v-model="form.articleVO.articleTitle" placeholder="请在这里输入标题"></el-input>
           </el-form-item>
           <el-form-item label="" class='mb_25'>
-            <el-input class='title' v-model="form.input" placeholder="从这里开始正文"></el-input>
+            <div class="edit_container">
+                <quill-editor 
+                    v-model="form.articleVO.articleContent" 
+                    ref="myQuillEditor" 
+                    :options="editorOption" 
+                    @blur="onEditorBlur($event)" @focus="onEditorFocus($event)"
+                    @change="onEditorChange($event)">
+                </quill-editor>
+            </div>
+              <!-- <MyQuill v-model='form.articleContent'></MyQuill> -->
           </el-form-item>
-          
-          <el-form-item label="" class='mb_25'>
-            <!-- <vue-ueditor-wrap v-model="form.msg"></vue-ueditor-wrap> -->
-              <el-input
-                type="textarea"
-                :autosize='{minRows: 5}'
-                placeholder="请输入内容"
-                v-model="textarea1">
-              </el-input>
-          </el-form-item>
-          <el-form-item label="选择封面图片" class='mb_25 img_size' label-width='120px'>
+        </div>
+        <div>
+          <el-form-item label="选择封面图片" class='mb_25 img_size' label-width='120px' props='articleVO.articleCoverImagePath' :rules="{ required: true, message: '封面不能为空'}">
               <el-upload
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :show-file-list="false"
+                :action="apiUrl + '/file/upload'"
                 :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload">
-                <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                :show-file-list="false"
+                name='files'
+                :before-upload='before'
+                >
+                <div v-loading="loading">
+                  <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </div>
               </el-upload>
           </el-form-item>
+        </div>
+        <div v-if='form.articleVO.articleType == 1'>
           <el-form-item label="发布设置：" class='mb_25' label-width='120px'>
-            <el-radio-group v-model="form.radio">
+            <el-radio-group v-model="form.articleVO.articleCanDiscuss">
               <el-radio :label="1">用户可评论</el-radio>
               <el-radio :label="2">用户不可评论</el-radio>
             </el-radio-group>
           </el-form-item>
         </div>
-        <div v-else>
-          <el-form-item label="" class='mb_25'>
-            <el-input class='链接' v-model="input" placeholder="粘贴地址"></el-input>
+        <div v-if='form.articleVO.articleType == 2'>
+          <el-form-item label="链接" class='mb_25'>
+            <el-input class='' v-model="form.articleVO.articleSuperUrl" placeholder="粘贴地址"></el-input>
           </el-form-item>
         </div>
 
       </el-form>
       <div class='flex jc_center'>
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click='sumbit("form")'>保存</el-button>
         <el-button>预览</el-button>
       </div>
     </div>
+    <el-dialog title="上传" :visible.sync="allObj.dialogTableVisible">
+      <MyUpload @uploadSuccess='uploadSuccess'></MyUpload>
+    </el-dialog>
+    
+     <el-dialog title="选择素材" :visible.sync="isShow" width='70vw'>
+      <div>
+        <el-checkbox-group v-model="dialogCheckList" class='flex wrap'>
+          <div v-for='(item, index) in list' :key='index' class='dialog_list'>
+            <el-checkbox :label="index" class='pr'>
+              <video :src="video" class='dialog_video'>
+                您的浏览器不支持 video 标签。
+              </video>
+              <div>习近平访拉萨2.jpg</div>
+            </el-checkbox>
+          </div>
+        </el-checkbox-group>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShow = false">取 消</el-button>
+        <el-button type="primary" @click="dialogConfirm">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts">
+// import MyQuill from '@/pc/components/MyQuill.vue'
+import { quillEditor, Quill } from "vue-quill-editor"; //调用编辑器
+import 'quill/dist/quill.core.css';
+import 'quill/dist/quill.snow.css';
+import 'quill/dist/quill.bubble.css';
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import MyUpload from '@/pc/components/MyUpload.vue'
+import {apiUrl} from '@/pc/url.config.js'
+let allObj = {dialogTableVisible: false}
+const toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+  ['blockquote', 'code-block'],
+
+  [{'header': 1}, {'header': 2}],               // custom button values
+  [{'list': 'ordered'}, {'list': 'bullet'}],
+  [{'script': 'sub'}, {'script': 'super'}],      // superscript/subscript
+  [{'indent': '-1'}, {'indent': '+1'}],          // outdent/indent
+  [{'direction': 'rtl'}],                         // text direction
+
+  [{'size': ['small', false, 'large', 'huge']}],  // custom dropdown
+  [{'header': [1, 2, 3, 4, 5, 6, false]}],
+
+  [{'color': []}, {'background': []}],          // dropdown with defaults from theme
+  [{'font': []}],
+  [{'align': []}],
+  ['link', 'image', 'video'],
+  // ['clean'],                                         // remove formatting button
+  ['voice'] 
+]
 @Component({
-  props: {
-    url: {
-    type: String
-    }
-  }
+  components:{quillEditor, MyUpload}
 })
 export default class MyEdit extends Vue {
-  form: any = {
-    type: 1,
-    msg: ''
+  apiUrl: String = apiUrl
+  editorOption: any = {
+    modules: {
+      toolbar: {
+        container: toolbarOptions,  // 工具栏
+        handlers: {
+          'image': function (value) {
+            if (value) {
+              allObj.dialogTableVisible = true
+            } else {
+              this.quill.format('image', false);
+            }
+          },
+          'video': function (value) {
+            if (value) {
+              allObj.dialogTableVisible = true
+            } else {
+              this.quill.format('video', false);
+            }
+          },
+          'voice': function(value){ //添加工具方法，即点击时模仿点击上传组件的按钮
+            if (value) {
+              allObj.dialogTableVisible = true
+            } else {
+              this.quill.format('voice', false);
+            }
+          }
+        }
+      }
+    },
+    initVoiceButton:function(){ //初始化"voice"按钮样式
+      // let voiceButton = document.querySelector('.ql-voice'); //"ql-" 是插件自动加的前缀
+      // voiceButton.classList.add('fa');
+      // voiceButton.classList.add('fa-volume-up');
+      // voiceButton.classList.add('fa-lg');
+        // 当然，可以直接手写样式，如：
+      // voiceButton.style.csstext = "width:80px; border:1px solid #ccc; border-radius:5px;";
+      // voiceButton.innertext="上传音频";
+      const sourceEditorButton = document.querySelector('.ql-voice');
+      sourceEditorButton.style.cssText = "width:50px; border:1px solid #ccc; border-radius:5px;";
+      sourceEditorButton.innerText="音频"
+    }
   }
-  input: String = ''
-  imageUrl: String = ''
-  handleAvatarSuccess(res, file) {
-    this.imageUrl = URL.createObjectURL(file.raw);
-  }
-  beforeAvatarUpload(file) {
-    const isJPG = file.type === 'image/jpeg';
-    const isLt2M = file.size / 1024 / 1024 < 2;
+  onEditorReady(editor) { // 准备编辑器
 
-    if (!isJPG) {
-      this.$message.error('上传头像图片只能是 JPG 格式!');
+  }
+  onEditorBlur(){} // 失去焦点事件
+  onEditorFocus(){} // 获得焦点事件
+  onEditorChange(){} // 内容改变事件
+  get editor() {
+    return this.$refs.myQuillEditor.quill
+  }
+  loading: Boolean = false
+  allObj: any = allObj
+  form: any = {
+    articleVO: {
+      articleSuperUrl: '',
+      articleTitle: '',
+      articleContent: '',
+      articleCanDiscuss: '',
+      articleType: 1
     }
-    if (!isLt2M) {
-      this.$message.error('上传头像图片大小不能超过 2MB!');
+  }
+  isEdit: Boolean = false
+  imageUrl: String = ''
+  isShow: Boolean = false
+  list: Array<any> = []
+  dialogCheckList: Array<any> = []
+  dialogType: Number = 1
+  handleAvatarSuccess(res, file) {
+    this.form.articleVO.articleCoverImagePath = res.data.path
+    this.imageUrl = res.data.pathAll
+    this.loading = false
+  }
+  uploadSuccess(res){
+    console.log(res)
+    let key = 'img'
+    if (res.data.stffix == 'mp4') {
+      key = 'video'
     }
-    return isJPG && isLt2M;
+    if (res.data.stffix == 'mp3') {
+      key = 'audio'
+    }
+    let quill = this.editor
+    let length = quill.getSelection().index;  // 获取光标所在位置
+
+    let BlockEmbed = Quill.import('blots/block/embed');
+    class AudioBlot extends BlockEmbed {
+        static create(value) {
+          console.log(value)
+          let node = super.create();
+          node.setAttribute('src', value.url);      //设置audio的src属性
+          node.setAttribute('controls', true);      //设置audio的controls，否则他将不会显示
+          node.setAttribute('controlsList', 'nodownload');      //设置audio的下载功能为不能下载
+          node.setAttribute('id', 'voice');         //设置一个id
+          return node;
+        }
+    }
+    AudioBlot.blotName = key;
+    AudioBlot.tagName = key;      //自定义的标签为audio
+    Quill.register(AudioBlot);
+
+    // insertEmbed(index: Number(插入的位置), type: String(标签类型), value: any(参数，将传入到create的方法中去), source: String = 'api')
+    quill.insertEmbed(length, key,  {url: res.data.pathAll}, "api");
+    quill.setSelection(length + 1);  //光标位置向后移动一位
+
+    allObj.dialogTableVisible = false
+  }
+  sumbit(formName){
+    this.$refs[formName].validate((valid) => {
+      if (valid) {
+        console.log(this.$route.query)
+        this.$emit("sumbit", this.form, this.$route.query.type, this.$route.query.routerName)
+      } else {
+        return false;
+      }
+    });
+    
+  }
+  before(){
+    this.loading = true
+    return true
+  }
+  error(){
+    this.loading = false
+  }
+  dialogConfirm(){
+    let key = 'video'
+    if (this.dialogType == 1) {
+      key = 'image'
+    }
+    if (this.dialogType == 2) {
+      key = 'audio'
+    }
+    let quill = this.editor
+    let length = quill.getSelection().index;
+    // this.dialogCheckList.forEach(el => {
+      quill.insertEmbed(length, key, 'http://182.61.5.103/storage/data/202106052349340011.mp3')
+    // })
+  }
+  mounted() {
+    this.editorOption.initVoiceButton();
+    console.log(this.$route.query) 
+    if (this.$route.query.item) {
+      this.form = JSON.parse(this.$route.query.item)
+      this.imageUrl = this.form.articleVO?.articleCoverImagePath
+      this.isEdit = true
+
+    }
   }
 }
 </script>
@@ -114,6 +296,9 @@ export default class MyEdit extends Vue {
       ::v-deep .el-input__inner{
         text-align: center;
       }
+    }
+    .width_400{
+      width: 400px;
     }
   }
   ::v-deep .img_size{
@@ -142,4 +327,8 @@ export default class MyEdit extends Vue {
     height: 178px;
     display: block;
   }
+  ::v-deep .ql-editor{
+      height:400px;
+  }
+  
 </style>

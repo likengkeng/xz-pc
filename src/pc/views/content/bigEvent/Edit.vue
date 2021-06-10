@@ -1,63 +1,63 @@
 <template>
   <div class="big_event_edit">
     <el-form :model="form" ref="form" label-width="100px" class="demo-dynamic">
-      <div v-for='(item, index) in form.domains' :key='index' class='list_box border_radius pr'>
-        <div class='size_16 del_icon cursor_pointer' @click='remove(item, index)'>
+      <div class='list_box border_radius pr'>
+        <!-- <div class='size_16 del_icon cursor_pointer' @click='remove(item, index)'>
           删除<i class="el-icon-delete-solid"></i>
-        </div>
+        </div> -->
         <el-form-item
           label="时间"
-          props='date'
+          props='memorabiliaDatetime'
           :rules="{
             required: true, message: '时间不能为空', trigger: 'blur'
           }"
         >
            <el-date-picker
-            v-model="form.date"
+            class='width_400'
+            format='yyyy-MM-dd'
+            v-model="form.memorabiliaDatetime"
             type="date"
             placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
         <el-form-item
           label="大事记标题"
-          props='date'
+          props='memorabiliaTitle'
           :rules="{
             required: true, message: '大事记标题不能为空', trigger: 'blur'
           }"
         >
-          <el-input v-model="form.name"></el-input>
+          <el-input class='width_400' v-model="form.memorabiliaTitle"></el-input>
         </el-form-item>
         <el-form-item
           label="大事记内容"
-          props='date'
+          props='memorabiliaContent'
           :rules="{
             required: true, message: '大事记内容不能为空', trigger: 'blur'
           }"
         >
-          <el-input v-model="form.name"></el-input>
+          <el-input class='width_400' v-model="form.memorabiliaContent"></el-input>
         </el-form-item>
         <el-form-item
           label="大事记图片"
-          props='date'
+          props='memorabiliaImagePaths'
           :rules="{
             required: true, message: '大事记图片不能为空', trigger: 'blur'
           }"
         >
           <el-upload
-            :limit='4'
-            class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            :file-list="fileList"
+            :action="apiUrl + '/file/upload'"
+            name='files'
+            list-type="picture-card"
+            :on-change='onchang'>
+            <i class="el-icon-plus"></i>
           </el-upload>
         </el-form-item>
       </div>
-      <el-form-item label="">
+      <!-- <el-form-item label="">
            <el-button type="primary" @click="addDomain">添加事迹</el-button>
-      </el-form-item>
+      </el-form-item> -->
       <div class='dividing'></div>
       <el-form-item
           label="发布设置"
@@ -66,7 +66,7 @@
             required: true, message: '用户是否可评论', trigger: 'blur'
           }"
         >
-           <el-radio-group v-model="form.radio">
+           <el-radio-group v-model="form.memorabiliaCanDiscuss">
               <el-radio :label="1">用户可评论</el-radio>
               <el-radio :label="2">用户不可评论</el-radio>
             </el-radio-group>
@@ -82,12 +82,36 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import $http from '@/pc/api/event';
+import {apiUrl} from '@/pc/url.config.js'
+
 @Component({})
 export default class BigEventEdit extends Vue {
-  form: any = {domains: [{}], radio: 1}
+  apiUrl: String = apiUrl
+  form: any = {}
   imageUrl: String = ''
+  fileList: Array<any> = []
+  isEdit: Boolean = false
   submitForm(key){
-
+    this.$refs[key].validate((valid) => {
+      if (valid) {
+        let key = 'memorabiliaAdd'
+        if (this.isEdit) {
+          key = 'memorabiliaEdit'
+        }
+        $http[key]([{...this.form}])
+        .then(res => {
+          this.$message({
+            message: '操作成功',
+            type: 'success'
+          });
+          this.$router.push({name: 'bigEvent'})
+        })
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
   }
   addDomain(){
     this.form.domains.push({
@@ -100,23 +124,34 @@ export default class BigEventEdit extends Vue {
       this.form.domains.splice(index, 1)
     }
   }
-  handleAvatarSuccess(res, file) {
-    this.imageUrl = URL.createObjectURL(file.raw);
-  }
-  beforeAvatarUpload(file) {
-    const isJPG = file.type === 'image/jpeg';
-    const isLt2M = file.size / 1024 / 1024 < 2;
+  onchang(file, fileList){
+    if (!this.isEdit) {
+    this.form.memorabiliaImagePaths = []
 
-    if (!isJPG) {
-      this.$message.error('上传头像图片只能是 JPG 格式!');
     }
-    if (!isLt2M) {
-      this.$message.error('上传头像图片大小不能超过 2MB!');
-    }
-    return isJPG && isLt2M;
+    fileList.forEach(el => {
+      if (el.response?.data?.path) {
+        this.form.memorabiliaImagePaths.push(el.response?.data?.path)
+      }
+    });
+    console.log(fileList)
+  }
+  preview(){
   }
   cancel(){
     this.$router.go(-1)
+  }
+  mounted() {
+    if (this.$route.query.item) {
+      this.form = JSON.parse(this.$route.query.item)
+      this.form.memorabiliaImagePathAlls.forEach(item => {
+          let obj = new Object();
+          obj.url = item;
+          this.fileList.push(obj);
+      });
+      // this.fileList = this.form.memorabiliaImagePathAlls
+      this.isEdit = true
+    }
   }
 }
 </script>
@@ -137,6 +172,9 @@ export default class BigEventEdit extends Vue {
     .dividing{
       margin: 50px 0px;
       border-bottom: 1px solid #E5E5E5;
+    }
+    .width_400{
+      width: 400px;
     }
   }
   ::v-deep .avatar-uploader .el-upload {

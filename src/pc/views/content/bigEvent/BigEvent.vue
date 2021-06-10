@@ -10,20 +10,20 @@
     </div>
       <div v-for='(item, index) in list' :key='index' class='list pr flex'>
         <div class='time'>
-          <div class='size_28 bold'>2022年</div>
-          <div class='size_18'>12月12日</div>
+          <div class='size_28 bold header'>{{item.memorabiliaDatetime}}</div>
+          <!-- <div class='size_18'>12月12日</div> -->
+          <div class='flex'>
+            <div class='del_icon cursor_pointer' @click='del(item)'><i class="el-icon-delete-solid"></i></div>
+            <div class='edit__icon bg_color_fff text_center cursor_pointer' @click='edit(item)'><i class='el-icon-edit'></i></div>
+          </div>
         </div>
         <div class='content'>
-          <div @mouseover.stop="mouseOver(item, index)" @mouseleave.stop="mouseLeave(item, index)" class='flex pr'>
-            <img :src="img" alt="" class='img' >
-            <div class='edit_modal' v-if='item.checked'>
-              <div class='del_icon cursor_pointer' @click='del(item)'><i class="el-icon-delete-solid"></i></div>
-              <div class='edit__icon bg_color_fff text_center cursor_pointer' @click='edit(item)'><i class='el-icon-edit'></i></div>
-            </div>
+          <div class='flex pr'>
+            <img v-for='el in item.memorabiliaImagePathAlls' :key='el' :src="el" alt="" class='img' >
           </div>
-          <div class='size_20 bold list_header'>大标题文案</div>
+          <div class='size_20 bold list_header'>{{item.memorabiliaTitle	}}</div>
           <div class='text_content line_clamp2'>
-            位身中确单生期具革活口成干委较状府压织流题市长支提联会史运多级织增日受群商四在干听马列线
+            {{item.memorabiliaContent}}
           </div>
         </div>
       </div>
@@ -34,6 +34,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import img from '@/images/news1.jpg';
+import $http from '@/pc/api/event';
 
 // import $http from '@/pc/api/event';
 // import { eventList } from '../mock';
@@ -42,8 +43,26 @@ import img from '@/images/news1.jpg';
 })
 export default class BigEvent extends Vue {
   bigEventList: Array<{[key: string]: any}> = [];
-  list: Array<any> = [{}, {}, {}, {}, {}]
+  list: Array<any> = []
   img: String = img
+  getList(){
+    // 获取列表
+    $http.memorabiliaList()
+    .then(res => {
+      res.data.map(el => {
+        el.memorabiliaDatetime = this.format( el.memorabiliaDatetime)
+      })
+      this.list = res.data
+    })
+  }
+  format(shijianchuo){
+    //shijianchuo是整数，否则要parseInt转换
+    var time = new Date(shijianchuo);
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDate();
+    return `${y}-${m}-${d}`
+  }
   add(){
     this.$router.push({name: 'bigEventEdit'})
   }
@@ -61,10 +80,14 @@ export default class BigEvent extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      this.$message({
-        type: 'success',
-        message: '删除成功!'
-      });
+      $http.memorabiliaDelete({memorabiliaId: item.memorabiliaId})
+      .then(res => {
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        });
+        this.getList()
+      })
     }).catch(() => {
       this.$message({
         type: 'info',
@@ -73,17 +96,10 @@ export default class BigEvent extends Vue {
     });
   }
   edit(item){
-    this.$router.push({name: 'bigEventEdit'})
+    this.$router.push({name: 'bigEventEdit', query: {item : JSON.stringify(item)}})
   }
   mounted() {
-    // $http.getBigEventList()
-    //   .then((res) => {
-    //     // bigEventList = res;
-    //   })
-    //   .catch(() => {
-
-    //   });
-    // this.bigEventList = eventList;
+    this.getList()
   }
 }
 </script>
@@ -114,6 +130,9 @@ export default class BigEvent extends Vue {
          top: 20px
        }
     }
+    .header{
+      width: 100px;
+    }
     .list{
       padding-bottom: 45px;
       &::before{
@@ -138,22 +157,12 @@ export default class BigEvent extends Vue {
         left: -28.5px;
       }
       .list_header{
-        margin: 28px 0px 11px;
+        margin: 0px 0px 11px;
       }
       .text_content{
         width: 336px;
       }
-      .edit_modal{
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        background-color: rgba(0,0,0,.5);
-        z-index: 10;
-        display: flex;
-        justify-content: flex-end;
-        .del_icon, .edit__icon{
+       .del_icon, .edit__icon{
           width: 30px;
           height: 30px;
           line-height: 30px;
@@ -162,7 +171,6 @@ export default class BigEvent extends Vue {
           background-color: #fff;
           margin: 9px 23px 0px 0px;
         }
-      }
     }
     .time{
       margin-right: 32px;
@@ -170,6 +178,8 @@ export default class BigEvent extends Vue {
     .img{
       width: 336px;
       height: 213px;
+      margin-right: 20px;
+      margin-bottom: 20px;
     }
   }
 </style>

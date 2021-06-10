@@ -8,13 +8,13 @@
         </div>
       </div>
       <div v-for='(item, index) in list' :key='index' class='list bg_color_fff border_radius ovh border pr' @mouseover.stop="mouseOver(item, index)" @mouseleave.stop="mouseLeave(item, index)">
-        <div class='img'></div>
+        <div class='img'><img :src="item.articleVO.articleCoverImagePath" alt=""></div>
         <div class='list_content'>
           <div>
-            <div class='title size_16 bold mb_7'>大标题</div>
-            <div class='line_clamp4'>藏与祖国同呼吸、共命运，西藏的发展历程也与祖国的发展历程紧密相连新中国成立以来，在中国共产党的领导下，西藏地区历经和平藏与祖国同呼吸、共命运，西藏的发展历程也与祖国的发展历程紧密相连新中国成立以来，在中国共产党的领导下，西藏地区历经和平</div>
+            <div class='title size_16 bold mb_7'>{{item.articleVO.articleTitle}}</div>
+            <div class='line_clamp4 articleContent' v-html='item.articleVO.articleContent'></div>
           </div>
-          <div class='color_666 updata_time'>更新于2021.06.09</div>
+          <div class='color_666 updata_time'>更新于{{item.articleVO.createDatetime}}</div>
         </div>
         <div class='edit_modal' v-if='item.checked'>
           <div class='del_icon cursor_pointer' @click='del(item)'><i class="el-icon-delete-solid"></i></div>
@@ -33,6 +33,15 @@ import Component from 'vue-class-component';
   props: {
     list: {
     type: Array
+    },
+    name: {
+      type: String
+    },
+    type: {
+      type: String
+    },
+    routerName: {
+      type: String
     }
   }
 })
@@ -53,12 +62,13 @@ export default class MyList extends Vue {
     this.$emit("del", item, index)
   }
   edit(item){
-    this.$emit("edit", item)
+    this.$router.push({name: this.name, query: {item: JSON.stringify(item)}, type: this.type, routerName: this.routerName})
+    // this.$emit("edit", item)
   }
   add(){
-    this.$emit("add")
+    this.$router.push({name: this.name, query: {type: this.type, routerName: this.routerName}})
   }
-  mounted: {
+  mounted() {
     
   }
 }
@@ -74,6 +84,7 @@ export default class MyList extends Vue {
     .list{
       width: 23%;
       margin: 0px 1% 28px;
+      min-height: 200px;
       box-sizing: border-box;
       .img{
         width: 100%;
@@ -81,7 +92,13 @@ export default class MyList extends Vue {
         display: block;
         margin-bottom: 7px;
         background-color: #ccc;
+        img{
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
       }
+      
       .list_content{
         padding: 0px 15px 22px;
       }
@@ -114,4 +131,18 @@ export default class MyList extends Vue {
     }
   }
   
+</style>
+
+<style lang='scss'>
+  .articleContent{
+        img{
+          display: none;
+        }
+        video{
+          display: none;
+        }
+        audio{
+          display: none;
+        }
+      }
 </style>

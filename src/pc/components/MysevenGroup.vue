@@ -6,25 +6,26 @@
     </el-tabs>
     <div v-if='activeName==1'>
       <div class='mb_20'>上传封面图片</div>
-      <div>
+      <div class='flex mb_20 wrap'>
+        <img v-for='item in list' :key='item.areaVoiceCoverImagePath' :src="item.areaVoiceCoverImagePath" alt="" class='img'>
         <el-upload
           class="avatar-uploader"
           :limit='1'
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          :http-request="upload"
+          :action="apiUrl + '/file/upload'"
+          :multiple="true"
+          :show-file-list="false">
+          <img v-if="fileUrl" :src="fileUrl" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </div>
       <div>
-        <el-button type="primary" @click='storageImg'>保存</el-button>
+        <el-button type="primary" @click='storageImg' :loading="btnLoading">保存</el-button>
         <el-button>取消</el-button>
       </div>
     </div>
     <div v-if='activeName==2'>
-      <my-list :list='list' @add='add' @edit='edit' @del='del'></my-list>
+      <my-list :list='list' name='SevenGroupEdit' :routerName='name' :type='type' @del='del'></my-list>
     </div>
   </div>
 </template>
@@ -33,19 +34,39 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import MyList from '@/pc/components/MyList.vue'
+import $http from '@/pc/api/event';
+import {apiUrl} from '@/pc/url.config.js'
 
 @Component({
-    components:{MyList}
-
+  components:{MyList},
+  watch: {
+    '$route'(val, oldval){
+      console.log(val)
+      this.type = val.meta.type
+      this.getList()
+    }
+  }
 })
 export default class MysevenGroup extends Vue {
+  apiUrl: String = apiUrl
   activeName: string = '1'
+  name: String = ''
   list: Array<any> = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
-  imageUrl: String = ''
+  type: Number = 1
+  fileUrl: String = ''
+  btnLoading: Boolean = false
   handleClick(){
+    this.getList()
   }
   getList(){
     // 获取列表
+    $http.voiceList({
+      areaVoiceMeunType: this.type,
+      areaVoiceType: this.activeName
+    })
+    .then(res => {
+      this.list = res
+    })
   }
   del(item){
     // 删除
@@ -54,27 +75,19 @@ export default class MysevenGroup extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      this.$message({
-        type: 'success',
-        message: '删除成功!'
-      });
-      this.getList()
-    }).catch(() => {
-      this.$message({
-        type: 'info',
-        message: '已取消删除'
-      });          
+      $http.voiceDelete({areaVoiceId: item.areaVoiceId})
+      .then(res => {
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        });
+        this.getList()
+      })
+    }).catch(() => {        
     });
     
   }
-  edit(item){
-    let name = 'leaderCareEdit'
-    this.$router.push({name})
-  }
-  add(){
-    let name = 'leaderCareEdit'
-    this.$router.push({name})
-  }
+
   handleAvatarSuccess(res, file) {
     this.imageUrl = URL.createObjectURL(file.raw);
   }
@@ -90,9 +103,46 @@ export default class MysevenGroup extends Vue {
     }
     return isJPG && isLt2M;
   }
-  storageImg(){}
+  upload(file){
+    console.log(file)
+    let param = new FormData(); //创建form对象
+    param.append("files", file.file); //通过append向form对象添加数据
+    $http.fileUpload(param).then((res) => {
+      this.fileUrl = res.pathAll
+    });
+  }
+  storageImg(){
+    if (!this.fileUrl) {
+      this.$message({
+        message: '请先选择图片',
+        type: 'warning'
+      });
+      return
+    }
+    this.btnLoading = true
+    $http.voiceAdd({
+      areaVoiceCoverImagePath: this.fileUrl,
+      areaVoiceType: 1,
+      areaVoiceMeunType: this.type
+    })
+    .then(res => {
+      this.btnLoading = false
+      this.$message({
+        message: '上传成功',
+        type: 'success'
+      });
+      this.fileUrl = ''
+      this.getList()
+    })
+  }
+  
   mounted() {
-    console.log(this.$router.options)
+    // console.log(this.$route.meta.type)
+    this.type = this.$route.meta.type
+    this.name = this.$route.name
+    if(this.$route.query.type)  this.activeName = '2'
+
+    this.getList()
   }
 }
 </script>
@@ -125,5 +175,12 @@ export default class MysevenGroup extends Vue {
     .mb_20{
       margin-bottom: 20px;
     }
+  }
+  .img{
+    width: 178px;
+    height: 178px;
+    display: block;
+    margin-right: 20px;
+    margin-bottom: 20px;
   }
 </style>
