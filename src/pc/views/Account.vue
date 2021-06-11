@@ -150,7 +150,7 @@ export default class Account extends Vue {
         pageSize: this.	pageSize
     })
     .then(res => {
-      this.tableData = res.data
+      this.tableData = res.data.data
       this.total = res.totalElements
     })
   }

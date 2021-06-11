@@ -10,8 +10,8 @@
     </div>
       <div v-for='(item, index) in list' :key='index' class='list pr flex'>
         <div class='time'>
-          <div class='size_28 bold header'>{{item.memorabiliaDatetime}}</div>
-          <!-- <div class='size_18'>12月12日</div> -->
+          <div class='size_28 bold header'>{{item.y}}</div>
+          <div class='size_18'>{{item.m}}</div>
           <div class='flex'>
             <div class='del_icon cursor_pointer' @click='del(item)'><i class="el-icon-delete-solid"></i></div>
             <div class='edit__icon bg_color_fff text_center cursor_pointer' @click='edit(item)'><i class='el-icon-edit'></i></div>
@@ -50,7 +50,8 @@ export default class BigEvent extends Vue {
     $http.memorabiliaList()
     .then(res => {
       res.data.map(el => {
-        el.memorabiliaDatetime = this.format( el.memorabiliaDatetime)
+        el.y = this.format(el.memorabiliaDatetime).y
+        el.m = this.format(el.memorabiliaDatetime).m
       })
       this.list = res.data
     })
@@ -61,7 +62,9 @@ export default class BigEvent extends Vue {
     var y = time.getFullYear();
     var m = time.getMonth()+1;
     var d = time.getDate();
-    return `${y}-${m}-${d}`
+    return {
+      y, m: `${m}月${d}日`
+    }
   }
   add(){
     this.$router.push({name: 'bigEventEdit'})

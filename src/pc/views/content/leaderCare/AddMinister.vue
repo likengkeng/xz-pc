@@ -1,12 +1,14 @@
 <template>
   <div class='AddMinister'>
      <el-form ref="form" label-position='right' :model="form" label-width="90px">
-        <el-form-item label="发布类型：" class='mb_25'>
+        <!-- <el-form-item label="发布类型：" class='mb_25' props='type' :rules="{
+              required: true, message: '照片不能为空', trigger: 'blur'
+            }">
           <el-radio-group v-model="form.type">
             <el-radio :label="1">文章</el-radio>
             <el-radio :label="2">超链接</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
         <div class='item_box border_radius'>
           <el-form-item :label='`第几任`' props='leaderVO.leaderSort' :rules="{
               required: true, message: '第几任不能为空', trigger: 'blur'
@@ -52,8 +54,8 @@
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('dynamicValidateForm')">提交</el-button>
-          <el-button @click="resetForm('dynamicValidateForm')">重置</el-button>
+          <el-button type="primary" @click="submitForm('form')">提交</el-button>
+          <el-button @click="resetForm('form')">重置</el-button>
         </el-form-item>
      </el-form>
   </div>
@@ -63,6 +65,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import {apiUrl} from '@/pc/url.config.js'
+import $http from '@/pc/api/event';
 
 @Component({})
 export default class AddMinister extends Vue {
@@ -82,14 +85,36 @@ export default class AddMinister extends Vue {
   }
   onchang(file, fileList){
     if (!this.isEdit) {
-    this.form.leaderVO.leaderImagePath = []
+    this.form.leaderVO.leaderImagePaths = []
     }
     fileList.forEach(el => {
       if (el.response?.data?.path) {
-        this.form.leaderVO.leaderImagePath.push(el.response?.data?.path)
+        this.form.leaderVO.leaderImagePaths.push(el.response?.data?.path)
       }
     });
     console.log(fileList)
+  }
+  submitForm(key){
+    this.$refs[key].validate((valid) => {
+      if (valid) {
+        let key = 'leaderCareAdd'
+        if (this.isEdit) {
+          key = 'leaderCareEdit'
+        }
+        this.form.leaderCareType = 3
+        $http[key]({...this.form})
+        .then(res => {
+          this.$message({
+            message: '操作成功',
+            type: 'success'
+          });
+          this.$router.push({name: 'leaderCare'})
+        })
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
   }
   mounted() {
     if (this.$route.query.item) {

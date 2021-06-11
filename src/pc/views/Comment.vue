@@ -8,8 +8,9 @@
         <el-col :span="6">
           <el-date-picker
             style='width: 100%'
-            v-model="value1"
+            v-model="queryTime"
             type="date"
+            value-format='timestamp'
             placeholder="选择日期">
           </el-date-picker>
         </el-col>
@@ -17,7 +18,7 @@
            状态
         </el-col>
         <el-col :span="6">
-          <el-select v-model="value" placeholder="请选择" style='width: 90%'>
+          <el-select v-model="touristCommentStatus" placeholder="请选择" style='width: 90%'>
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -27,7 +28,7 @@
             </el-select>
         </el-col>
       </el-row>
-      <el-button type="primary">查询   </el-button>
+      <el-button type="primary" @click='query'>查询   </el-button>
     </div>
     <div>
       <el-tabs v-model="activeName" @tab-click="handleClick" class='p_lr_30'>
@@ -113,7 +114,6 @@ import Component from 'vue-class-component';
 
 export default class Comment extends Vue {
   activeName: string = '1'
-
   tableData: Array<any> = []
   account: String = ''
   form: any = {}
@@ -121,13 +121,18 @@ export default class Comment extends Vue {
   value1: String = ''
   options: Array<any> = [
     {
-      value: '选项1',
+      value: '1',
       label: '审核通过'
     }, {
-      value: '选项2',
+      value: '3',
       label: '审核不通过'
+    }, {
+      value: '2',
+      label: '审核中'
     }
   ]
+  touristCommentStatus: String = ''
+  queryTime: any = ''
   pageSize: Number = 10
   total: Number = 0
   pageIndex: Number = 1
@@ -142,12 +147,18 @@ export default class Comment extends Vue {
     $http.commentList({
       touristCommentType: this.activeName,
       pageIndex: this.pageIndex,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+      touristCommentStatus: this.touristCommentStatus,
+      queryTime: this.queryTime
     })
     .then(res => {
-      this.tableData = res.data
-      this.total = res.totalElements
+      this.tableData = res.data.data
+      this.total = res.data.totalElements
     })
+  }
+  query(){
+    this.pageIndex = 1
+    this.getList()
   }
   handleSizeChange(val){
     this.pageSize = val

@@ -105,8 +105,8 @@ const http = {
   },
    // 领导关怀删除
    leaderCareDelete: (data: any) => {
-    const url = `leader/care/delete`
-    return apiCreator().post(url, data);
+    const url = `leader/care/delete?leaderCareId=${data.leaderCareId}`
+    return apiCreator().get(url);
   },
    // 领导关怀新增
    leaderCareAdd: (data: any) => {

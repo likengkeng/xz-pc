@@ -132,8 +132,8 @@ export default class LeaderCare extends Vue {
     })
     .then(res => {
       console.log(res)
-      this.list = res.data
-      this.total = res.total
+      this.list = res.data.data
+      this.total = res.data.totalElements
       
       // this.$set(this[`${this.activeName}Page`], 'total', res.totalElements)
 
@@ -182,7 +182,7 @@ export default class LeaderCare extends Vue {
     this.videoSrc=item.pathAll
     this.imgModal = true
   }
-  add(){}
+  add(){this.isShow = true}
   mounted() {
     this.getList()
   }
