@@ -1,14 +1,14 @@
 <template>
   <div class="leader-care">
     <el-tabs v-model="activeName" @tab-click="handleClick" class='p_lr_30'>
-      <el-tab-pane label="老西藏精神" name="1"></el-tab-pane>
+      <el-tab-pane label="老西藏" name="1"></el-tab-pane>
       <el-tab-pane label="优秀共产党员" name="2"></el-tab-pane>
       <el-tab-pane label="优秀党务工作者" name="3"></el-tab-pane>
-      <el-tab-pane label="优秀基层干部" name="4"></el-tab-pane>
-      <el-tab-pane label="先进的基层党组织" name="5"></el-tab-pane>
-      <el-tab-pane label="优秀援藏干部" name="6"></el-tab-pane>
-      <el-tab-pane label="组团式援藏医生教师代表" name="7"></el-tab-pane>
-      <el-tab-pane label="优秀组工干部" name="8"></el-tab-pane>
+      <el-tab-pane label="先进基层党组织" name="4"></el-tab-pane>
+      <el-tab-pane label="优秀援藏干部人才" name="5"></el-tab-pane>
+      <el-tab-pane label="优秀组工干部" name="6"></el-tab-pane>
+      <el-tab-pane label="最美公务员" name="7"></el-tab-pane>
+      <!-- <el-tab-pane label="优秀组工干部" name="8"></el-tab-pane> -->
 
     </el-tabs>
     <my-list :list='list' name='roleModelEdit' :type='activeName' @del='del'></my-list>
@@ -24,7 +24,6 @@ import $http from '@/pc/api/event';
 
 @Component({
     components:{MyList}
-
 })
 export default class RoleModel extends Vue {
   activeName: string = '1'

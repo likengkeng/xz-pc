@@ -75,9 +75,9 @@ import Component from 'vue-class-component';
 import $http from '@/pc/api/event';
 import MyUpload from '@/pc/components/MyUpload.vue'
 
-import img from '@/images/news1.jpg';
-import mp3 from '@/images/audio.mp3';
-import video from '@/images/video.mp4';
+// import img from '@/images/news1.jpg';
+// import mp3 from '@/images/audio.mp3';
+// import video from '@/images/video.mp4';
 interface Object {
   total: Number;
   pageSize: Number;
@@ -93,9 +93,9 @@ export default class LeaderCare extends Vue {
   audioList: Array<any> = []
   videoList: Array<any> = []
   list: Array<any> = this.imgList
-  img: String = img
-  mp3: String = mp3
-  video: String = video
+  // img: String = img
+  // mp3: String = mp3
+  // video: String = video
   total: Number = 0
   pageSize: Number = 12
   currentPage: Number = 1

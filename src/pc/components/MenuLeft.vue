@@ -1,5 +1,9 @@
 <template>
   <div class="menu_left">
+    <div class='flex al_center'>
+      <img :src="logo" alt="" class='logo'>
+      <div class='color_fff size_16'>西藏组织部</div>
+    </div>
     <el-menu
       default-active="2"
       class="el-menu-vertical-demo"
@@ -43,10 +47,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
+import logo from '@/images/logo.png';
 
 @Component({})
 export default class MenuLeft extends Vue {
   navList:[] = this.$router.options.routes[0].children
+  logo: String = logo
 
   handleOpen(){}
   handleClose(){}
@@ -61,11 +67,23 @@ export default class MenuLeft extends Vue {
     background: #001529;
     box-shadow: 2px 0px 6px 0px rgba(0, 21, 41, 0.35);
     min-height: 100vh;
-    padding-top: 68px;
+    padding-top: 16px;
     height: 100%;
     box-sizing: border-box;
+
+    .logo{
+      width: 36px;
+      height: 38px;
+      display: block;
+      margin-right: 12px;
+      margin-left: 14px;
+    }
   }
+
   ::v-deep .is-active{
     background-color: #1890FFFF!important;
+  }
+  ::v-deep .el-menu{
+    border-right: 0px;
   }
 </style>

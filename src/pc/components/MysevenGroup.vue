@@ -51,7 +51,7 @@ export default class MysevenGroup extends Vue {
   apiUrl: String = apiUrl
   activeName: string = '1'
   name: String = ''
-  list: Array<any> = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+  list: Array<any> = []
   type: Number = 1
   fileUrl: String = ''
   btnLoading: Boolean = false
@@ -65,7 +65,7 @@ export default class MysevenGroup extends Vue {
       areaVoiceType: this.activeName
     })
     .then(res => {
-      this.list = res
+      this.list = res.data
     })
   }
   del(item){
@@ -108,7 +108,7 @@ export default class MysevenGroup extends Vue {
     let param = new FormData(); //创建form对象
     param.append("files", file.file); //通过append向form对象添加数据
     $http.fileUpload(param).then((res) => {
-      this.fileUrl = res.pathAll
+      this.fileUrl = res.data.pathAll
     });
   }
   storageImg(){

@@ -69,8 +69,8 @@
         <el-table-column
           label="操作" width='400px'>
           <template slot-scope="scope">
-            <el-button type='primary'>审核通过</el-button>
-            <el-button>审核不通过</el-button>
+            <el-button type='primary' @click='adopt(scope.row)'>审核通过</el-button>
+            <el-button @click='noAdopt(scope.row)'>审核不通过</el-button>
             <el-button @click="delail(scope.row)">详情</el-button>
           </template>
         </el-table-column>
@@ -167,6 +167,35 @@ export default class Comment extends Vue {
   handleCurrentChange(val){
     this.pageIndex = val
     this.getList()
+  }
+  noAdopt(item){
+    this.$confirm('审核不通过, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      $http.commentNg({touristCommentId: item.touristCommentId})
+      .then(el => {
+        this.$message({
+          type: 'success',
+          message: '操作成功!'
+        });
+        this.getList()
+      })
+    }).catch(() => {
+               
+    });
+    
+  }
+  adopt(item){
+    $http.commentOk({touristCommentId: item.touristCommentId})
+    .then(el => {
+      this.$message({
+          type: 'success',
+          message: '操作成功!'
+        });
+      this.getList()
+    })
   }
   mounted() {
     this.getList()

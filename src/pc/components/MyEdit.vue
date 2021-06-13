@@ -10,9 +10,9 @@
         </el-form-item>
         <div v-if='form.articleVO.articleType == 1'>
           <el-form-item label="选择：" class='mb_25'>
-            <el-button @click='dialogType=1,isShow=true'>图片</el-button>
-            <el-button @click='dialogType=2,isShow=true'>音频</el-button>
-            <el-button @click='dialogType=3,isShow=true'>视频</el-button>
+            <el-button @click='material(3)'>图片</el-button>
+            <el-button @click='material(2)'>音频</el-button>
+            <el-button @click='material(1)'>视频</el-button>
           </el-form-item>
           <el-form-item label="" class='mb_25'>
             <el-input class='header' v-model="form.articleVO.articleTitle" placeholder="请在这里输入标题"></el-input>
@@ -75,11 +75,16 @@
       <div>
         <el-checkbox-group v-model="dialogCheckList" class='flex wrap'>
           <div v-for='(item, index) in list' :key='index' class='dialog_list'>
-            <el-checkbox :label="index" class='pr'>
-              <video :src="video" class='dialog_video'>
+            <el-checkbox :label="item" class='pr'>
+              <video :src="item.pathAl" class='dialog_video' v-if='dialogType==3'>
                 您的浏览器不支持 video 标签。
               </video>
-              <div>习近平访拉萨2.jpg</div>
+              <audio :src="item.pathAll" controls class='dialog_video' v-if='dialogType==2'>
+                您的浏览器不支持 audio 标签。
+              </audio>
+              <img :src='item.pathAll' class='dialog_video' v-if='dialogType==1' />
+
+              <div>{{item.name}}</div>
             </el-checkbox>
           </div>
         </el-checkbox-group>
@@ -102,6 +107,8 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import MyUpload from '@/pc/components/MyUpload.vue'
 import {apiUrl} from '@/pc/url.config.js'
+import $http from '@/pc/api/event';
+
 let allObj = {dialogTableVisible: false}
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -255,17 +262,38 @@ export default class MyEdit extends Vue {
   }
   dialogConfirm(){
     let key = 'video'
-    if (this.dialogType == 1) {
+    if (this.dialogType == 3) {
       key = 'image'
     }
     if (this.dialogType == 2) {
       key = 'audio'
     }
     let quill = this.editor
-    let length = quill.getSelection().index;
-    // this.dialogCheckList.forEach(el => {
-      quill.insertEmbed(length, key, 'http://182.61.5.103/storage/data/202106052349340011.mp3')
-    // })
+    let length = quill.getSelection()?.index || 0;
+    this.dialogCheckList.forEach(el => {
+      if (this.dialogType == 3) {
+        quill.insertEmbed(length, 'image', el.pathAll)
+      }
+      if (this.dialogType == 2) {
+        quill.insertEmbed(length, 'audio', el.pathAll)
+      }
+      if (this.dialogType == 1) {
+        quill.insertEmbed(length, 'video', el.pathAll)
+      }
+    })
+  }
+  material(index){
+    this.dialogType = index
+    this.isShow=true
+    this.getMaterialList()
+  }
+  getMaterialList(){
+    $http.materialListType({
+      type: this.dialogType
+    })
+    .then(res => {
+      this.list = res.data
+    })
   }
   mounted() {
     this.editorOption.initVoiceButton();

@@ -168,12 +168,12 @@ const http = {
   },
   // 评论
   commentNg: (data: any) => {
-    const url = `tourist/comment/ng`
+    const url = `tourist/comment/ng?touristCommentId=${data.touristCommentId}`
     return apiCreator().get(url, data);
   },
   // 评论
   commentOk: (data: any) => {
-    const url = `tourist/comment/ok`
+    const url = `tourist/comment/ok?touristCommentId=${data.touristCommentId}`
     return apiCreator().get(url, data);
   },
   // 评论
