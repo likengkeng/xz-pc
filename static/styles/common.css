@@ -117,3 +117,7 @@ body{
   line-clamp: 4;
   -webkit-box-orient: vertical;
 }
+p{
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
