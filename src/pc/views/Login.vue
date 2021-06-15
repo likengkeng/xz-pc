@@ -33,14 +33,29 @@ export default class Login extends Vue {
     name: '', password: ''
   }
   login(){
-    console.log(this)
+    console.log(this.form.name)
+    if (!this.form.name) {
+      console.log(this.form.name, !this.form.name)
+      this.$message({
+          message: '请输入账号',
+          type: 'warning'
+        });
+      return
+    }
+    if (!this.form.password) {
+      this.$message({
+          message: '请输入密码',
+          type: 'warning'
+        });
+      return
+    }
     $http.login({
-      "loginName": "admin",
-      "password": "admin"
+      "loginName": this.form.name,
+      "password": this.form.password
     })
       .then((res) => {
         console.log(res)
-        localStorage.setItem("accountId",res.data.accountId)
+        sessionStorage.setItem("accountId",res.data.accountId)
         this.$router.push({name: 'home'})
       })
       .catch(() => {

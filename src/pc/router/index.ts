@@ -45,7 +45,10 @@ const Account  = () => import(/* webpackChunkName:"Account " */ '@/pc/views/Acco
 
 const Material = () => import(/* webpackChunkName:"Material " */ '@/pc/views/Material.vue');
 
-export default new Router({
+
+
+
+const router = new Router({
   mode: 'hash',
   routes: [
     {
@@ -255,12 +258,33 @@ export default new Router({
         },
       ]
     },
-    { path: '/', redirect: { name: 'home' } },
+    { path: '/', redirect: { name: 'home' }, meta: {} },
     {
       path: '/login',
       name: 'login',
+      meta: {requireAuth: true},
       component: Login,
     },
     
   ],
 });
+router.beforeEach((to, from, next) => {
+  if (!to.meta.requireAuth) { // 判断该路由是否需要登录权限
+    if (sessionStorage.getItem("accountId")) { // 判断本地是否存在token
+      next()
+    } else {
+      // 未登录,跳转到登陆页面
+      next({
+        path: '/login'
+      })
+    }
+  } else {
+    if (sessionStorage.getItem("accountId")) {
+      next('/home');
+    } else {
+      next();
+    }
+  }
+})
+  
+export default router

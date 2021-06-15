@@ -42,7 +42,7 @@ export default class MenuHeader extends Vue {
   logout(){
     $http.logout()
     .then(res => {
-      localStorage.removeItem("accountId")
+      sessionStorage.removeItem("accountId")
       this.$router.push({name: 'login'})
     })
   }
