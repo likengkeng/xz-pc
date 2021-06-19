@@ -15,10 +15,7 @@
         prop="accountLoginName"
         label="账号">
       </el-table-column>
-      <el-table-column
-        prop="password"
-        label="密码">
-      </el-table-column>
+     
       <el-table-column
         prop="createDatetime"
         label="更新时间">
@@ -150,9 +147,25 @@ export default class Account extends Vue {
         pageSize: this.	pageSize
     })
     .then(res => {
+      res.data.data.map(el => {
+        el.createDatetime = this.format(el.createDatetime)
+        return el
+      })
       this.tableData = res.data.data
       this.total = res.totalElements
     })
+  }
+  format(shijianchuo){
+    //shijianchuo是整数，否则要parseInt转换
+    var time = new Date(shijianchuo);
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDate() < 10 ? `0${time.getDate()}` : time.getDate();
+
+    var h = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
+    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes(); 
+    var s = time.getSeconds() < 10 ? `0${time.getSeconds()}` : time.getSeconds();
+    return `${y}-${m}-${d} ${h}:${mm}:${s}`
   }
   handleSizeChange(val){
     this.pageSize = val

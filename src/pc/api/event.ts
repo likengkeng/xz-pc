@@ -66,13 +66,13 @@ const http = {
   },
   // 生成断点续传的元数据（大于5m的文件使用该接口上传）小于5m的文件使用/file/upload的上传
   metadataGet: (data: any) => {
-    const url = `metadata/get`
-    return apiCreator().get(url, data);
+    const url = `metadata/get?file_size=${data.file_size}&file_name=${data.file_name}&checksum=${data.checksum}`
+    return apiCreator().get(url);
   },
   // 元数据上传
-  blockUpload: (data: any) => {
+  blockUpload: (header: any, data: any) => {
     const url = `block/upload`
-    return apiCreator({"Content-Type": "application/octet-stream"}).post(url, data);
+    return apiCreator(header).post(url, data);
   },
   fileUpload: (data: any) => {
     const url = `file/upload`
@@ -179,7 +179,7 @@ const http = {
   // 评论
   commentReply: (data: any) => {
     const url = `tourist/comment/reply`
-    return apiCreator().get(url, data);
+    return apiCreator().post(url, data);
   },
 
 }

@@ -14,7 +14,7 @@ import $http from '@/pc/api/event';
 })
 export default class LeaderCareEdit extends Vue {
   sumbit(form: any, type: any){
-    console.log(form)
+    console.log(form, type)
     let key = 'leaderCareAdd'
     if (form.leaderCareId) {
       key = 'leaderCareEdit'

@@ -19,7 +19,16 @@
         </div>
         <div class='content'>
           <div class='flex pr'>
-            <img v-for='el in item.memorabiliaImagePathAlls' :key='el' :src="el" alt="" class='img' >
+            <div  v-for='el in item.showPath' :key='el.path'>
+                <video v-if='el.type=="mp4"' :src="el.path" class='img'>
+                    您的浏览器不支持 video 标签。
+                </video>
+               <audio :src="el.path" controls class='img' v-else-if='el.type=="mp3"'>
+                您的浏览器不支持 audio 标签。
+              </audio>
+                <img :src="el.path" alt="" class='img' v-else>
+            </div>
+            
           </div>
           <div class='size_20 bold list_header'>{{item.memorabiliaTitle	}}</div>
           <div class='text_content line_clamp2'>
@@ -52,6 +61,17 @@ export default class BigEvent extends Vue {
       res.data.map(el => {
         el.y = this.format(el.memorabiliaDatetime).y
         el.m = this.format(el.memorabiliaDatetime).m
+        el.showPath = []
+        el.memorabiliaImagePathAlls.forEach(item => {
+          const index = item.lastIndexOf(".")
+          const fileType = item.substr(index + 1)
+          el.showPath.push({
+            path: item,
+            type: fileType
+          })
+        })
+        return el
+        
       })
       this.list = res.data
     })

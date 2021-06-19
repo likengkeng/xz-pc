@@ -36,6 +36,7 @@
               :action="apiUrl + '/file/upload'"
               name='files'
               list-type="picture-card"
+              :headers="importHeaders"
               :on-change='onchang'>
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -46,9 +47,6 @@
           <el-form-item
             label="简介"
             props='leaderVO.leaderComment'
-            :rules="{
-              required: true, message: '简介不能为空', trigger: 'blur'
-            }"
           >
             <el-input :rows='4' type="textarea" class='input' v-model="form.leaderVO.leaderComment"></el-input><span class='color_666'>不限字数</span> 
           </el-form-item>
@@ -83,6 +81,9 @@ export default class AddMinister extends Vue {
       key: Date.now()
     });
   }
+  importHeaders = {
+    TOKEN: sessionStorage.getItem("token")
+  }
   onchang(file, fileList){
     if (!this.isEdit) {
     this.form.leaderVO.leaderImagePaths = []
@@ -108,7 +109,7 @@ export default class AddMinister extends Vue {
             message: '操作成功',
             type: 'success'
           });
-          this.$router.push({name: 'leaderCare'})
+          this.$router.push({name: 'leaderCare', query: {type: 3}})
         })
       } else {
         console.log('error submit!!');

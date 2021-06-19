@@ -55,7 +55,7 @@ export default class Login extends Vue {
     })
       .then((res) => {
         console.log(res)
-        sessionStorage.setItem("accountId",res.data.accountId)
+        sessionStorage.setItem("token",res.data.token)
         this.$router.push({name: 'home'})
       })
       .catch(() => {

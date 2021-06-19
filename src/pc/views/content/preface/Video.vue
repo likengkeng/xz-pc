@@ -12,7 +12,7 @@
             <div v-for='(item, index) in videoList' :key='index' class=''>
               <el-checkbox :label="item" class='pr'>
                 <div class='flex list'>
-                  <video :src="video" class='video'>
+                  <video :src="item.path" class='video'>
                     您的浏览器不支持 video 标签。
                   </video>
                   <div class='flex column jc_sa'>
@@ -27,7 +27,7 @@
             <div v-for='(item, index) in imgList' :key='index' class=''>
               <el-checkbox :label="item" class='pr'>
                 <div class='img_list'>
-                  <img :src="img" alt="" class='img'>
+                  <img :src="item.pathAll" alt="" class='img'>
                   <div class='line_clamp1 width_176'>
                     {{item.name}}
                   </div>
@@ -47,7 +47,7 @@
         <el-checkbox-group v-model="dialogCheckList" class='flex wrap'>
           <div v-for='(item, index) in materialList' :key='index' class='dialog_list'>
             <el-checkbox :label="item" class='pr'>
-              <video :src="video" class='dialog_video'>
+              <video :src="item.pathAll" class='dialog_video'>
                 您的浏览器不支持 video 标签。
               </video>
               <div class='line_clamp1 width_176'>{{item.name}}</div>
@@ -67,7 +67,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import video from '@/images/video.mp4';
 import img from '@/images/news1.jpg';
 
 import $http from '@/pc/api/event';
@@ -78,7 +77,6 @@ import $http from '@/pc/api/event';
 export default class Video extends Vue {
   activeName: String = '1'
   imgList: Array<any> = []
-  video: String = video
   img: String = img
   videoList: Array<any> = []
   checkList: Array<Number> = []

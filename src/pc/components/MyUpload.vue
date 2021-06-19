@@ -7,6 +7,8 @@
       :action="apiUrl + '/file/upload'"
       :data="uploadData"
       :on-change="onchange"
+      :headers="importHeaders"
+      :before-upload='before'
       :multiple="true"
       :auto-upload="false"
       :show-file-list="false"
@@ -76,6 +78,9 @@
       })
       }, 1000);
     }
+    importHeaders = {
+      TOKEN: sessionStorage.getItem("token")
+    }
     chunkedUpload() {
       this.showProgress = true;
       let fileList = this.fileList;
@@ -83,7 +88,8 @@
       fileList.forEach((element) => {
         element.params.checksum = md5(element.reader.result);
         element.params.file_size = element.reader.result.byteLength;
-        console.log(element.params.file_size, 5*1024*1024)
+        console.log(element.params, 5*1024*1024)
+
         if (element.params.file_size > 5 * 1024 * 1024) {
 
           //文件的实际大小大于5M走断点续传
@@ -135,18 +141,36 @@
               idx += blockSize[i];
               qpInfo.progress += parseFloat((100 / blockCount).toFixed(2));
             }
-            this.$message({
-              message: "上传成功",
-              type: "success",
-            });
-            qpInfo.progress = 100;
-            this.uploadSuccess(res)
+            if (res.data.materialVo?.pathAll) {
+              this.$message({
+                message: "上传成功",
+                type: "success",
+              });
+              qpInfo.progress = 100;
+              this.uploadSuccess(res)
+            }
           });
         } else {
           idx += blockSize[i];
           qpInfo.progress += parseFloat((100 / blockCount).toFixed(2));
         }
       }
+    }
+    before(e){
+      console.log(e)
+      // if (con.files[0].type.str.match(RegExp(/video/))) {
+      //     if (!con.files[0].type.str.match(RegExp(/mp4/))) {
+      //         this.$message('视频格式只允许mp4')
+      //         return false
+      //     }
+      // }
+      // if (con.files[0].type.str.match(RegExp(/audio/))) {
+      //     if (!con.files[0].type.str.match(RegExp(/mpeg/)) || !con.files[0].type.str.match(RegExp(/mp3/)) ) {
+      //         this.$message('音频格式只允许mp3')
+      //         return false
+      //     }
+      // }
+      return true
     }
     onchange(e) {
       let reader = new FileReader();

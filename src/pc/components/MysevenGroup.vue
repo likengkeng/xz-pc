@@ -12,6 +12,7 @@
           class="avatar-uploader"
           :limit='1'
           :http-request="upload"
+          :headers="importHeaders"
           :action="apiUrl + '/file/upload'"
           :multiple="true"
           :show-file-list="false">
@@ -55,6 +56,9 @@ export default class MysevenGroup extends Vue {
   type: Number = 1
   fileUrl: String = ''
   btnLoading: Boolean = false
+  importHeaders = {
+    TOKEN: sessionStorage.getItem("token")
+  }
   handleClick(){
     this.getList()
   }
@@ -65,8 +69,24 @@ export default class MysevenGroup extends Vue {
       areaVoiceType: this.activeName
     })
     .then(res => {
+      res.data.map(el => {
+        el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
+        return el
+      })
       this.list = res.data
     })
+  }
+  format(shijianchuo){
+    //shijianchuo是整数，否则要parseInt转换
+    var time = new Date(shijianchuo);
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDate() < 10 ? `0${time.getDate()}` : time.getDate();
+
+    var h = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
+    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes(); 
+    var s = time.getSeconds() < 10 ? `0${time.getSeconds()}` : time.getSeconds();
+    return `${y}-${m}-${d} ${h}:${mm}:${s}`
   }
   del(item){
     // 删除

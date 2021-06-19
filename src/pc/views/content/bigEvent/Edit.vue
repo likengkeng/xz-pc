@@ -32,26 +32,21 @@
         <el-form-item
           label="大事记内容"
           props='memorabiliaContent'
-          :rules="{
-            required: true, message: '大事记内容不能为空', trigger: 'blur'
-          }"
         >
           <el-input class='width_400' v-model="form.memorabiliaContent"></el-input>
         </el-form-item>
         <el-form-item
-          label="大事记图片"
+          label="大事记文件"
           props='memorabiliaImagePaths'
-          :rules="{
-            required: true, message: '大事记图片不能为空', trigger: 'blur'
-          }"
         >
           <el-upload
-            :file-list="fileList"
             :action="apiUrl + '/file/upload'"
             name='files'
-            list-type="picture-card"
-            :on-change='onchang'>
-            <i class="el-icon-plus"></i>
+            :on-remove='remove'
+            :headers="importHeaders"
+            :on-change='onchang'
+            :file-list="fileList">
+            <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
       </div>
@@ -92,14 +87,32 @@ export default class BigEventEdit extends Vue {
   imageUrl: String = ''
   fileList: Array<any> = []
   isEdit: Boolean = false
+  importHeaders = {
+    TOKEN: sessionStorage.getItem("token")
+  }
   submitForm(key){
     this.$refs[key].validate((valid) => {
       if (valid) {
+        if (!this.fileList.length) {
+          this.$message({
+            message: '请上传文件',
+            type: 'none'
+          });
+          return
+        }
+        this.form.memorabiliaImagePaths = []
+        this.fileList.forEach(el => {
+          if (el.path || el.response?.data?.pathAll) {
+            this.form.memorabiliaImagePaths.push(el.path || el.response?.data?.path)
+          }
+        })
+        let data = [this.form]
         let key = 'memorabiliaAdd'
         if (this.isEdit) {
           key = 'memorabiliaEdit'
+          data = this.form
         }
-        $http[key]([{...this.form}])
+        $http[key](data)
         .then(res => {
           this.$message({
             message: '操作成功',
@@ -125,16 +138,18 @@ export default class BigEventEdit extends Vue {
     }
   }
   onchang(file, fileList){
-    if (!this.isEdit) {
-    this.form.memorabiliaImagePaths = []
-
-    }
+    this.fileList = fileList
+  }
+  remove(file, fileList){
+    this.fileList = []
     fileList.forEach(el => {
       if (el.response?.data?.path) {
-        this.form.memorabiliaImagePaths.push(el.response?.data?.path)
+        list.push(el.response.data.pathAll)
+        let obj = new Object();
+          obj.url = el.response.data.pathAll;
+          this.fileList.push(obj);
       }
-    });
-    console.log(fileList)
+    })
   }
   preview(){
   }
@@ -149,7 +164,6 @@ export default class BigEventEdit extends Vue {
           obj.url = item;
           this.fileList.push(obj);
       });
-      // this.fileList = this.form.memorabiliaImagePathAlls
       this.isEdit = true
     }
   }

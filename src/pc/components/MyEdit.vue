@@ -36,6 +36,7 @@
                 class="avatar-uploader"
                 :action="apiUrl + '/file/upload'"
                 :on-success="handleAvatarSuccess"
+                 :headers="importHeaders"
                 :show-file-list="false"
                 name='files'
                 :before-upload='before'
@@ -64,7 +65,7 @@
       </el-form>
       <div class='flex jc_center'>
         <el-button type="primary" @click='sumbit("form")'>保存</el-button>
-        <el-button>预览</el-button>
+        <el-button @click='dialogVisible=true'>预览</el-button>
       </div>
     </div>
     <el-dialog title="上传" :visible.sync="allObj.dialogTableVisible">
@@ -94,6 +95,16 @@
         <el-button type="primary" @click="dialogConfirm">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      title="预览"
+      :visible.sync="dialogVisible"
+      width="60%">
+      <div class=''center>{{form.articleVO.articleTitle}}</div>
+      <div v-html='form.articleVO.articleContent'></div>
+      <span slot="footer" class="dialog-footer">
+      </span>
+    </el-dialog>
+      <input v-show='false' type="file" id='check' multiple @change='changefile'>
   </div>
 </template>
 
@@ -106,8 +117,9 @@ import 'quill/dist/quill.bubble.css';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import MyUpload from '@/pc/components/MyUpload.vue'
-import {apiUrl} from '@/pc/url.config.js'
+import {apiUrl, imgUrl} from '@/pc/url.config.js'
 import $http from '@/pc/api/event';
+import { Message } from 'element-ui'
 
 let allObj = {dialogTableVisible: false}
 const toolbarOptions = [
@@ -135,6 +147,7 @@ const toolbarOptions = [
 })
 export default class MyEdit extends Vue {
   apiUrl: String = apiUrl
+  dialogVisible = false
   editorOption: any = {
     modules: {
       toolbar: {
@@ -142,21 +155,21 @@ export default class MyEdit extends Vue {
         handlers: {
           'image': function (value) {
             if (value) {
-              allObj.dialogTableVisible = true
+              document.getElementById('check').click()
             } else {
               this.quill.format('image', false);
             }
           },
           'video': function (value) {
             if (value) {
-              allObj.dialogTableVisible = true
+              document.getElementById('check').click()
             } else {
               this.quill.format('video', false);
             }
           },
           'voice': function(value){ //添加工具方法，即点击时模仿点击上传组件的按钮
             if (value) {
-              allObj.dialogTableVisible = true
+              document.getElementById('check').click()
             } else {
               this.quill.format('voice', false);
             }
@@ -186,6 +199,9 @@ export default class MyEdit extends Vue {
   get editor() {
     return this.$refs.myQuillEditor.quill
   }
+  importHeaders = {
+    TOKEN: sessionStorage.getItem("token")
+  }
   loading: Boolean = false
   allObj: any = allObj
   form: any = {
@@ -210,19 +226,24 @@ export default class MyEdit extends Vue {
   }
   uploadSuccess(res){
     console.log(res)
+    const path = res.data?.materialVo?.pathAll || res.data?.pathAll || res.pathAll
+    console.log(path)
+    if (!path) {
+      return
+    }
     let key = 'img'
-    if (res.data.stffix == 'mp4') {
+    if (res.stffix == 'mp4') {
       key = 'video'
     }
-    if (res.data.stffix == 'mp3') {
+    if (res.stffix == 'mp3') {
       key = 'audio'
     }
-    let quill = this.editor
-    let length = quill.getSelection().index;  // 获取光标所在位置
-
-    let BlockEmbed = Quill.import('blots/block/embed');
-    class AudioBlot extends BlockEmbed {
-        static create(value) {
+    // console.log(eky)
+      let quill = this.editor
+      let length = quill.getSelection()?.index || 0;  // 获取光标所在位置
+      let BlockEmbed = Quill.import('blots/block/embed');
+      class AudioBlot extends BlockEmbed {
+          static create(value) {
           console.log(value)
           let node = super.create();
           node.setAttribute('src', value.url);      //设置audio的src属性
@@ -230,23 +251,35 @@ export default class MyEdit extends Vue {
           node.setAttribute('controlsList', 'nodownload');      //设置audio的下载功能为不能下载
           node.setAttribute('id', 'voice');         //设置一个id
           return node;
-        }
-    }
-    AudioBlot.blotName = key;
-    AudioBlot.tagName = key;      //自定义的标签为audio
-    Quill.register(AudioBlot);
+          }
+      }
+      AudioBlot.blotName = key;
+      AudioBlot.tagName = key;      //自定义的标签为audio
+      Quill.register(AudioBlot);
 
-    // insertEmbed(index: Number(插入的位置), type: String(标签类型), value: any(参数，将传入到create的方法中去), source: String = 'api')
-    quill.insertEmbed(length, key,  {url: res.data.pathAll}, "api");
-    quill.setSelection(length + 1);  //光标位置向后移动一位
+      // insertEmbed(index: Number(插入的位置), type: String(标签类型), value: any(参数，将传入到create的方法中去), source: String = 'api')
+      quill.insertEmbed(length, key,  {url: path}, "api");
+      quill.setSelection(length + 1);  //光标位置向后移动一位
 
     allObj.dialogTableVisible = false
   }
   sumbit(formName){
     this.$refs[formName].validate((valid) => {
       if (valid) {
-        console.log(this.$route.query)
-        this.$emit("sumbit", this.form, this.$route.query.type, this.$route.query.routerName)
+        delete this.form.createDatetime
+        delete this.form.updateDatetime
+        if (this.form.articleVO.createDatetime) {
+          delete this.form.articleVO.createDatetime
+        } 
+        if (this.form.articleVO.updateDatetime) {
+          delete this.form.articleVO.updateDatetime
+        }
+        if (this.form.articleVO.articleCoverImagePath) {
+          this.form.articleVO.articleCoverImagePath=this.form.articleVO.articleCoverImagePath.replace(imgUrl,"");
+          
+        }
+        const type = this.form.areaVoiceMeunType || this.form.organizationPowerType  || this.form.leaderCareType || this.$route.query.type
+        this.$emit("sumbit", this.form, type, this.$route.query.routerName)
       } else {
         return false;
       }
@@ -261,26 +294,11 @@ export default class MyEdit extends Vue {
     this.loading = false
   }
   dialogConfirm(){
-    let key = 'video'
-    if (this.dialogType == 3) {
-      key = 'image'
-    }
-    if (this.dialogType == 2) {
-      key = 'audio'
-    }
-    let quill = this.editor
-    let length = quill.getSelection()?.index || 0;
+
     this.dialogCheckList.forEach(el => {
-      if (this.dialogType == 3) {
-        quill.insertEmbed(length, 'image', el.pathAll)
-      }
-      if (this.dialogType == 2) {
-        quill.insertEmbed(length, 'audio', el.pathAll)
-      }
-      if (this.dialogType == 1) {
-        quill.insertEmbed(length, 'video', el.pathAll)
-      }
+      this.uploadSuccess(el)
     })
+    this.isShow = false
   }
   material(index){
     this.dialogType = index
@@ -295,15 +313,80 @@ export default class MyEdit extends Vue {
       this.list = res.data
     })
   }
+  changefile(e){
+      const con = document.getElementById('check')
+      if (con.files.length > 1) {
+          Message('最多1张')
+          return
+      }
+      if (con.files[0].size  > 5 * 1024 * 1024) {
+            Message('文件最大5M')
+          return
+      }
+      if (con.files[0].type.match(RegExp(/video/))) {
+          if (!con.files[0].type.match(RegExp(/mp4/))) {
+              Message('视频格式只允许mp4')
+              return
+          }
+      }
+      
+      if (con.files[0].type.match(RegExp(/audio/))) {
+          if (!(con.files[0].type.match(RegExp(/mpeg/)) || con.files[0].type.match(RegExp(/mp3/)) )) {
+              Message('音频格式只允许mp3')
+              return
+          }
+      }
+      if (con.files[0]) {
+          let file = con.files;
+          let param = new FormData(); //创建form对象
+          param.append("files", file[0]); //通过append向form对象添加数据
+          $http.fileUpload(param).then((res) => {
+              this.uploadSuccess1(res.data)
+          });
+
+      }
+  }
+  uploadSuccess1(res){
+      console.log(res)
+      let key = 'img'
+      if (res.stffix == 'mp4') {
+      key = 'video'
+      }
+      if (res.stffix == 'mp3') {
+      key = 'audio'
+      }
+      let quill = this.editor
+      let length = quill.getSelection().index;  // 获取光标所在位置
+
+      let BlockEmbed = Quill.import('blots/block/embed');
+      class AudioBlot extends BlockEmbed {
+          static create(value) {
+          console.log(value)
+          let node = super.create();
+          node.setAttribute('src', value.url);      //设置audio的src属性
+          node.setAttribute('controls', true);      //设置audio的controls，否则他将不会显示
+          node.setAttribute('controlsList', 'nodownload');      //设置audio的下载功能为不能下载
+          node.setAttribute('id', 'voice');         //设置一个id
+          return node;
+          }
+      }
+      AudioBlot.blotName = key;
+      AudioBlot.tagName = key;      //自定义的标签为audio
+      Quill.register(AudioBlot);
+
+      // insertEmbed(index: Number(插入的位置), type: String(标签类型), value: any(参数，将传入到create的方法中去), source: String = 'api')
+      quill.insertEmbed(length, key,  {url: res.pathAll}, "api");
+      quill.setSelection(length + 1);  //光标位置向后移动一位
+
+  }
   mounted() {
     this.editorOption.initVoiceButton();
-    console.log(this.$route.query) 
     if (this.$route.query.item) {
       this.form = JSON.parse(this.$route.query.item)
       this.imageUrl = this.form.articleVO?.articleCoverImagePath
       this.isEdit = true
-
     }
+    console.log(this.form)
   }
 }
 </script>
@@ -358,5 +441,10 @@ export default class MyEdit extends Vue {
   ::v-deep .ql-editor{
       height:400px;
   }
-  
+  .center{
+    text-align: center
+  }
+  .dialog_list{
+    margin: 0px 10px 10px 0px;
+  }
 </style>

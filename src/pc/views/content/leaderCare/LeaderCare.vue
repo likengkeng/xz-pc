@@ -50,13 +50,13 @@ import $http from '@/pc/api/event';
 })
 export default class LeaderCare extends Vue {
   activeName: string = '1'
-  list: Array<any> = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+  list: Array<any> = []
   name: String = 'leaderCareEdit'
   handleClick(){
     if (this.activeName == '1') {
       this.name = 'leaderCareEdit'
     }
-    if (this.activeName == '1') {
+    if (this.activeName == '2') {
       this.name = 'leaderCareEdit'
     }
     if (this.activeName == '3') {

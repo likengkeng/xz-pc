@@ -8,13 +8,13 @@
         </div>
       </div>
       <div v-for='(item, index) in list' :key='index' class='list bg_color_fff border_radius ovh border pr' @mouseover.stop="mouseOver(item, index)" @mouseleave.stop="mouseLeave(item, index)">
-        <div class='img'><img :src="item.articleVO.articleCoverImagePath" alt=""></div>
+        <div class='img'><img :src="(item.articleVO||{}).articleCoverImagePath" alt=""></div>
         <div class='list_content'>
           <div>
-            <div class='title size_16 bold mb_7'>{{item.articleVO.articleTitle}}</div>
-            <div class='line_clamp4 articleContent' v-html='item.articleVO.articleContent'></div>
+            <div class='title size_16 bold mb_7 line_clamp1'>{{(item.articleVO||{}).articleTitle}}</div>
+            <div class='line_clamp4 articleContent' v-html='(item.articleVO||{}).articleContent'></div>
           </div>
-          <div class='color_666 updata_time'>更新于{{item.articleVO.createDatetime}}</div>
+          <div class='color_666 updata_time'>更新于{{(item.articleVO||{}).createDatetime}}</div>
         </div>
         <div class='edit_modal' v-if='item.checked'>
           <div class='del_icon cursor_pointer' @click='del(item)'><i class="el-icon-delete-solid"></i></div>

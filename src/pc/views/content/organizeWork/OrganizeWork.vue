@@ -38,8 +38,27 @@ export default class OrganizeWork extends Vue {
       {organizationPowerType: this.activeName, organizationPowerMeunType: 1}
     )
     .then(res => {
+      res.data.map(el => {
+        if (el.articleVO?.createDatetime) {
+          el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
+        }
+        // 
+        return el
+      })
       this.list = res.data
     })
+  }
+  format(shijianchuo){
+    //shijianchuo是整数，否则要parseInt转换
+    var time = new Date(shijianchuo);
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDate() < 10 ? `0${time.getDate()}` : time.getDate();
+
+    var h = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
+    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes(); 
+    var s = time.getSeconds() < 10 ? `0${time.getSeconds()}` : time.getSeconds();
+    return `${y}-${m}-${d} ${h}:${mm}:${s}`
   }
   del(item){
     this.$confirm('此操作将永久删除该该数据, 是否继续?', '提示', {
