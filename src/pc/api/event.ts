@@ -9,6 +9,10 @@ const http = {
     const url = 'logout';
     return apiCreator().get(url, data);
   },
+  editPassword: (data = {}) => {
+    const url = 'account/modify/password'
+    return apiCreator().post(url, data);
+  },
   // 账号列表
   accountList: (data: any) => {
     const url = 'account/list'

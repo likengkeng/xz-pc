@@ -15,13 +15,13 @@
             </div>
           </div>
           <div v-for='(item, index) in list' :key='index' class='list bg_color_fff border_radius ovh border pr' @mouseover.stop="mouseOver(item, index)" @mouseleave.stop="mouseLeave(item, index)">
-            <div class='img'><img :src="item.leaderVO.leaderImagePathAlls[0]" alt=""></div>
+            <div class='img'><img :src="(item.leaderVO||{}).leaderImagePathAlls[0]" alt=""></div>
             <div class='list_content'>
               <div>
-                <div class='title size_16 bold mb_7'>{{item.leaderVO.leaderName}}</div>
-                <div class='line_clamp4 articleContent'>{{item.leaderVO.leaderComment}}</div>
+                <div class='title size_16 bold mb_7'>{{(item.leaderVO||{}).leaderName}}</div>
+                <div class='line_clamp4 articleContent'>{{(item.leaderVO||{}).leaderComment}}</div>
               </div>
-              <div class='color_666 updata_time'>更新于{{item.leaderVO.updateDatetime}}</div>
+              <div class='color_666 updata_time'>更新于{{item.leaderVO.updateDatetime || item.leaderVO.createDatetime}}</div>
             </div>
             <div class='edit_modal' v-if='item.checked'>
               <div class='del_icon cursor_pointer' @click='historydel(item)'><i class="el-icon-delete-solid"></i></div>
@@ -70,10 +70,21 @@ export default class LeaderCare extends Vue {
     .then(res => {
       console.log(res)
       res.data.map(el => {
-          el.leaderVO && (el.leaderVO.updateDatetime = this.format(el.leaderVO.updateDatetime))
-          el.articleVO && (el.articleVO.createDatetime = this.format(el.articleVO.createDatetime))
-          return el
-        })
+        if (el.leaderVO?.updateDatetime) {
+          el.leaderVO.updateDatetime = this.format(el.leaderVO.updateDatetime)
+        }
+        if (el.leaderVO?.createDatetime) {
+          el.leaderVO.createDatetime = this.format(el.leaderVO.createDatetime)
+        }
+        if (el.articleVO?.createDatetime) {
+          el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
+        }
+        if (el.articleVO?.updateDatetime) {
+          el.articleVO.updateDatetime = this.format(el.articleVO.updateDatetime)
+        }
+
+        return el
+      })
       if (this.activeName == '3') {
         this.list = res.data
       } else {

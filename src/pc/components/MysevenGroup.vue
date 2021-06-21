@@ -70,7 +70,10 @@ export default class MysevenGroup extends Vue {
     })
     .then(res => {
       res.data.map(el => {
-        el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
+        el.createDatetime = this.format(el.createDatetime)
+        if (el.articleVO?.createDatetime) {
+          el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
+        }
         return el
       })
       this.list = res.data

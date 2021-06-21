@@ -268,15 +268,20 @@ export default class MyEdit extends Vue {
       if (valid) {
         delete this.form.createDatetime
         delete this.form.updateDatetime
-        if (this.form.articleVO.createDatetime) {
+        if (this.form.articleVO?.createDatetime) {
           delete this.form.articleVO.createDatetime
         } 
-        if (this.form.articleVO.updateDatetime) {
+        if (this.form.articleVO?.updateDatetime) {
           delete this.form.articleVO.updateDatetime
+        }
+        if (this.form.leaderVO?.createDatetime) {
+          delete this.form.leaderVO.createDatetime
+        } 
+        if (this.form.leaderVO?.updateDatetime) {
+          delete this.form.leaderVO.updateDatetime
         }
         if (this.form.articleVO.articleCoverImagePath) {
           this.form.articleVO.articleCoverImagePath=this.form.articleVO.articleCoverImagePath.replace(imgUrl,"");
-          
         }
         const type = this.form.areaVoiceMeunType || this.form.organizationPowerType  || this.form.leaderCareType || this.$route.query.type
         this.$emit("sumbit", this.form, type, this.$route.query.routerName)

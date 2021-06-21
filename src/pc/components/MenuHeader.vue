@@ -5,26 +5,37 @@
       placement="right-end"
       width="100"
       trigger="click">
-      <div class='mb_20' @click='isShow = true'><i class='el-icon-s-tools'></i>  修改密码</div>
-      <div @click='logout'><i class='el-icon-switch-button'></i>  安全退出</div>
+      <div class='mb_20 cup' @click='isShow = true'><i class='el-icon-s-tools'></i>  修改密码</div>
+      <div @click='logout' class='cup'><i class='el-icon-switch-button'></i>  安全退出</div>
       <div slot="reference" class='cursor_pointer'>用户名</div>
     </el-popover>
     </div>
     <el-dialog title="修改密码" :visible.sync="isShow">
-      <el-form :model="form">
-        <el-form-item label="账号" label-width="120px">
-          <el-input v-model="form.name" placeholder="输入账号"></el-input>
+      <el-form ref="form" :model="form">
+       <el-form-item label="账号" props='accountLoginName' label-width="120px" :rules="{
+              required: true, message: '账号不能为空', trigger: 'blur'
+            }">
+          <el-input v-model="form.accountLoginName" placeholder='输入密码'></el-input>
         </el-form-item>
-        <el-form-item label="密码" label-width="120px">
-          <el-input v-model="form.name" placeholder='输入密码'></el-input>
+        <el-form-item label="旧密码" props='password' label-width="120px" :rules="{
+              required: true, message: '密码不能为空', trigger: 'blur'
+            }">
+          <el-input v-model="form.password" placeholder='输入密码'></el-input>
         </el-form-item>
-        <el-form-item label="确认密码" label-width="120px">
-          <el-input v-model="form.name" placeholder='确认密码'></el-input>
+        <el-form-item label="新密码" props='newPassword' label-width="120px" :rules="{
+              required: true, message: '密码不能为空', trigger: 'blur'
+            }">
+          <el-input v-model="form.newPassword" placeholder='输入密码'></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" props='confirmPassword' label-width="120px" :rules="{
+              required: true, message: '密码不能为空', trigger: 'blur'
+            }">
+          <el-input v-model="form.confirmPassword" placeholder='确认密码'></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="isShow = false">取 消</el-button>
-        <el-button type="primary" @click="isShow = false">确 定</el-button>
+        <el-button type="primary" @click="sumbit('form')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -46,6 +57,53 @@ export default class MenuHeader extends Vue {
       this.$router.push({name: 'login'})
     })
   }
+  sumbit(){
+    if (!this.form.accountLoginName) {
+      this.$message({
+        message: '账号不能为空',
+        type: 'none'
+      });
+      return
+    }
+    if (!this.form.password) {
+      this.$message({
+        message: '密码不能为空',
+        type: 'none'
+      });
+      return
+    }
+    if (!this.form.newPassword) {
+      this.$message({
+        message: '密码不能为空',
+        type: 'none'
+      });
+      return
+    }
+    if (!this.form.confirmPassword) {
+      this.$message({
+        message: '密码不能为空',
+        type: 'none'
+      });
+      return
+    }
+    if (this.form.newPassword != this.form.confirmPassword) {
+      this.$message({
+        message: '两次密码不一致',
+        type: 'none'
+      });
+      return
+    }
+    const accountId = sessionStorage.getItem("accountId")
+     $http.editPassword({...this.form, accountId })
+    .then(res => {
+      this.$message({
+        message: '操作成功',
+        type: 'success'
+      });
+      this.isShow = false
+      this.logout()
+    })
+  }
 }
 </script>
 <style scoped lang="scss">
@@ -60,5 +118,8 @@ export default class MenuHeader extends Vue {
 }
 .mb_20{
   margin-bottom: 20px;
+}
+.cup{
+  cursor: pointer
 }
 </style>

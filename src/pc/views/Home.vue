@@ -49,6 +49,7 @@ export default class Home extends Vue {
       display: flex;
       flex-direction: column;
       flex-grow: 1;
+      width: calc(100vw - 208px);
       .header{
         flex-shrink: 0;
       }

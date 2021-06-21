@@ -45,6 +45,7 @@ const Account  = () => import(/* webpackChunkName:"Account " */ '@/pc/views/Acco
 
 const Material = () => import(/* webpackChunkName:"Material " */ '@/pc/views/Material.vue');
 
+import { Message } from 'element-ui'
 
 
 
@@ -54,7 +55,6 @@ const router = new Router({
     {
       path: '/home',
       name: 'home',
-      redirect: '/account',
 
       component: Home,
       children: [
@@ -112,7 +112,7 @@ const router = new Router({
                 {
                   path: '/AddMinister',
                   name: 'AddMinister',
-                  meta: {name: '新增组织部长', isShowChildren: true},
+                  meta: {name: '新增/编辑组织部长', isShowChildren: true},
                   component: AddMinister
                 }
               ]
@@ -249,6 +249,15 @@ const router = new Router({
           name: 'account',
           component: Account,
           meta: { name: '账号管理', isShowChildren: true },
+          beforeEnter: (to, from, next) => {
+            const accountLoginName = sessionStorage.getItem("accountLoginName") == 'admin'
+            console.log(accountLoginName)
+            if (accountLoginName) {
+              next()
+            } else {
+              Message('该账号暂无权限')
+            }
+          }
         },
         {
           path: '/material',

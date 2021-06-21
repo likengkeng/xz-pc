@@ -102,6 +102,14 @@ export default class AddMinister extends Vue {
         if (this.isEdit) {
           key = 'leaderCareEdit'
         }
+        delete this.form.createDatetime
+        delete this.form.updateDatetime
+        if (this.form.leaderVO?.createDatetime) {
+          delete this.form.leaderVO.createDatetime
+        } 
+        if (this.form.leaderVO?.updateDatetime) {
+          delete this.form.leaderVO.updateDatetime
+        }
         this.form.leaderCareType = 3
         $http[key]({...this.form})
         .then(res => {

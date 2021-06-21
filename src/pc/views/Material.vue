@@ -61,7 +61,7 @@
     <el-dialog title="" :visible.sync="imgModal">
       <img v-if='activeName=="img"' :src="imgModalSrc" alt="" class='modal_src'>
       <!-- <audio v-if='activeName=="audio"' :src="imgModalSrc" alt="" class='modal_src'> -->
-      <video v-if='activeName=="video"' controls :src="videoSrc" alt="" class='modal_src'></video>
+      <video v-if='activeName=="video"' ref='video' controls :src="videoSrc" alt="" class='modal_src'></video>
     </el-dialog>
     <el-dialog title="上传素材" :visible.sync="isShow" width='70vw'>
       <MyUpload @uploadSuccess='uploadSuccess'></MyUpload>
@@ -84,8 +84,12 @@ interface Object {
   currentPage: Number;
 }
 @Component({
-    components:{ MyUpload}
-
+  components:{ MyUpload},
+  watch: {
+    'imgModal'(val, oldval){
+      this.$refs.video.pause()
+    }
+  }
 })
 export default class LeaderCare extends Vue {
   activeName: string = 'img'
@@ -253,8 +257,8 @@ export default class LeaderCare extends Vue {
     text-align: right;
   }
   .modal_src{
-    max-width: 80vw;
-    max-height: 80vh;
+    max-width: 100%;
+    max-height: 100%;
   }
   .mt_12{
     margin-top: 12px;

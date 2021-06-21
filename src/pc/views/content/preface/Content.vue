@@ -22,6 +22,16 @@ export default class PrefaceContent extends Vue {
     })
     .then(res => {
       console.log(res)
+       res.data.map(el => {
+        if (el.articleVO?.createDatetime) {
+          el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
+        }
+        if (el.articleVO?.updateDatetime) {
+          el.articleVO.updateDatetime = this.format(el.articleVO.updateDatetime)
+        }
+
+        return el
+      })
       this.list = res.data
     })
   }
@@ -42,7 +52,14 @@ export default class PrefaceContent extends Vue {
     }).catch(() => {       
     });
   }
-  
+  format(shijianchuo){
+    //shijianchuo是整数，否则要parseInt转换
+    var time = new Date(shijianchuo);
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDate();
+    return `${y}-${m}-${d}`
+  }
 
   mounted() {
     console.log(1111)

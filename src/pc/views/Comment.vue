@@ -18,7 +18,7 @@
            状态
         </el-col>
         <el-col :span="6">
-          <el-select v-model="touristCommentStatus" placeholder="请选择" style='width: 90%'>
+          <el-select v-model="touristCommentStatus" placeholder="请选择" clearable style='width: 90%'>
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -69,10 +69,12 @@
         <el-table-column
           label="操作" width='400px'>
           <template slot-scope="scope">
+          <div>
             <el-button v-if='scope.row.touristCommentStatus==1' @click='reply(scope.row)'>回复</el-button>
             <el-button v-if='scope.row.touristCommentStatus==2' type='primary' @click='adopt(scope.row)'>审核通过</el-button>
             <el-button v-if='scope.row.touristCommentStatus==2' @click='noAdopt(scope.row)'>审核不通过</el-button>
             <el-button @click="delail(scope.row)">详情</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -113,7 +115,7 @@
           @change="onEditorChange($event)">
       </quill-editor>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isShow = false">取 消</el-button>
+        <el-button @click="isReplyShow = false">取 消</el-button>
         <el-button type="primary" @click="commentReply">确 定</el-button>
       </div>
     </el-dialog>
