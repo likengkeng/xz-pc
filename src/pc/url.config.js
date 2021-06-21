@@ -1,6 +1,6 @@
 const obj = {
-  apiUrl: 'http://182.61.5.103/cms/',
-  imgUrl: 'http://182.61.5.103'
+  apiUrl: 'http://172.18.10.91/cms/',
+  imgUrl: 'http://172.18.10.91'
 }
 
 module.exports = {
