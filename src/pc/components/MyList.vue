@@ -49,7 +49,7 @@ export default class MyList extends Vue {
 
   handleClick(){
   }
-  
+
   mouseOver(item, index){
     item.checked = true
     this.list.splice(index, 1, item)
@@ -69,7 +69,7 @@ export default class MyList extends Vue {
     this.$router.push({name: this.name, query: {type: this.type, routerName: this.routerName}})
   }
   mounted() {
-    
+
   }
 }
 </script>
@@ -98,7 +98,7 @@ export default class MyList extends Vue {
           display: block;
         }
       }
-      
+
       .list_content{
         padding: 0px 15px 22px;
       }
@@ -130,7 +130,7 @@ export default class MyList extends Vue {
       }
     }
   }
-  
+
 </style>
 
 <style lang='scss'>

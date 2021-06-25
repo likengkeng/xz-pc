@@ -25,8 +25,6 @@ export default class MyHeader extends Vue {
     return this.$route.meta.name
   }
   mounted(){
-      console.log()
-
   }
 }
 </script>

@@ -14,10 +14,10 @@ function createAPI({ url, headers }: any) {
   instance.interceptors.request.use(
     (request: any): any => {
       loadingInstance  = Loading.service({ //加载loading
-				fullscreen: true, 
+				fullscreen: true,
 				text: 'Loading',
 	            spinner: 'el-icon-loading',
-	            background: 'rgba(0, 0, 0, 0.7)' 
+	            background: 'rgba(0, 0, 0, 0.7)'
       });
       if (request.method === 'get') {
         request.headers.common['Pragma'] = 'no-cache';
@@ -40,7 +40,6 @@ function createAPI({ url, headers }: any) {
         }
       }, 400)
       if (response.data.errorCode == '0000') {
-        console.log(response)
         return response.data;
       }
       Message({  //elemen组件库中的提示组件
@@ -62,7 +61,6 @@ function createAPI({ url, headers }: any) {
 }
 
 export const apiCreator: (headers?: any) => AxiosInstance = (headers) => {
-  console.log(headers)
   return createAPI({
     url: apiUrl,
     withCredentials: true,

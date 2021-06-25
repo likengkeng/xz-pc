@@ -38,7 +38,7 @@ const http = {
     const url = `material/query?materialType=${data.type}&page_index=${data.page_index}&page_size=${data.page_size}`
     return apiCreator().get(url, data);
   },
-  
+
   materialListType: (data: any) => {
     const url = `material/list?materialType=${data.type}`
     return apiCreator().get(url, data);
@@ -143,7 +143,7 @@ const http = {
     const url = `organization/power/delete?prefaceId=${data.prefaceId}`
     return apiCreator().get(url);
   },
-  
+
   // 七地
   voiceList: (data: any) => {
     const url = `area/voice/list`

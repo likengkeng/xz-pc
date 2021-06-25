@@ -41,7 +41,7 @@ export default class RoleModel extends Vue {
         if (el.articleVO?.createDatetime) {
           el.articleVO.createDatetime = this.format(el.articleVO.createDatetime)
         }
-        // 
+        //
         return el
       })
       this.list = res.data
@@ -55,7 +55,7 @@ export default class RoleModel extends Vue {
     var d = time.getDate() < 10 ? `0${time.getDate()}` : time.getDate();
 
     var h = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
-    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes(); 
+    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
     var s = time.getSeconds() < 10 ? `0${time.getSeconds()}` : time.getSeconds();
     return `${y}-${m}-${d} ${h}:${mm}:${s}`
   }
@@ -73,10 +73,10 @@ export default class RoleModel extends Vue {
         });
         this.getList()
       })
-    }).catch(() => {       
+    }).catch(() => {
     });
   }
-  
+
 
   mounted() {
         if(this.$route.query.type)  this.activeName = this.$route.query.type.toString()

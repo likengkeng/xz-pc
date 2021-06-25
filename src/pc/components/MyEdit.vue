@@ -19,10 +19,10 @@
           </el-form-item>
           <el-form-item label="" class='mb_25'>
             <div class="edit_container">
-                <quill-editor 
-                    v-model="form.articleVO.articleContent" 
-                    ref="myQuillEditor" 
-                    :options="editorOption" 
+                <quill-editor
+                    v-model="form.articleVO.articleContent"
+                    ref="myQuillEditor"
+                    :options="editorOption"
                     @blur="onEditorBlur($event)" @focus="onEditorFocus($event)"
                     @change="onEditorChange($event)">
                 </quill-editor>
@@ -71,7 +71,7 @@
     <el-dialog title="上传" :visible.sync="allObj.dialogTableVisible">
       <MyUpload @uploadSuccess='uploadSuccess'></MyUpload>
     </el-dialog>
-    
+
      <el-dialog title="选择素材" :visible.sync="isShow" width='70vw'>
       <div>
         <el-checkbox-group v-model="dialogCheckList" class='flex wrap'>
@@ -125,6 +125,9 @@ import MyUpload from '@/pc/components/MyUpload.vue'
 import {apiUrl, imgUrl} from '@/pc/url.config.js'
 import $http from '@/pc/api/event';
 import { Message } from 'element-ui'
+import VideoBlot from './video';
+Quill.register(VideoBlot);
+
 
 let allObj = {dialogTableVisible: false}
 const toolbarOptions = [
@@ -145,7 +148,7 @@ const toolbarOptions = [
   [{'align': []}],
   ['link', 'image', 'video'],
   // ['clean'],                                         // remove formatting button
-  ['voice'] 
+  ['voice']
 ]
 @Component({
   components:{quillEditor, MyUpload}
@@ -230,9 +233,7 @@ export default class MyEdit extends Vue {
     this.loading = false
   }
   uploadSuccess(res){
-    console.log(res)
     const path = res.data?.materialVo?.pathAll || res.data?.pathAll || res.pathAll
-    console.log(path)
     if (!path) {
       return
     }
@@ -249,7 +250,6 @@ export default class MyEdit extends Vue {
       let BlockEmbed = Quill.import('blots/block/embed');
       class AudioBlot extends BlockEmbed {
           static create(value) {
-          console.log(value)
           let node = super.create();
           node.setAttribute('src', value.url);      //设置audio的src属性
           node.setAttribute('controls', true);      //设置audio的controls，否则他将不会显示
@@ -275,13 +275,13 @@ export default class MyEdit extends Vue {
         delete this.form.updateDatetime
         if (this.form.articleVO?.createDatetime) {
           delete this.form.articleVO.createDatetime
-        } 
+        }
         if (this.form.articleVO?.updateDatetime) {
           delete this.form.articleVO.updateDatetime
         }
         if (this.form.leaderVO?.createDatetime) {
           delete this.form.leaderVO.createDatetime
-        } 
+        }
         if (this.form.leaderVO?.updateDatetime) {
           delete this.form.leaderVO.updateDatetime
         }
@@ -294,7 +294,7 @@ export default class MyEdit extends Vue {
         return false;
       }
     });
-    
+
   }
   before(){
     this.loading = true
@@ -344,7 +344,7 @@ export default class MyEdit extends Vue {
               return
           }
       }
-      
+
       if (con.files[0].type.match(RegExp(/audio/))) {
           if (!(con.files[0].type.match(RegExp(/mpeg/)) || con.files[0].type.match(RegExp(/mp3/)) )) {
               Message('音频格式只允许mp3')
@@ -362,7 +362,6 @@ export default class MyEdit extends Vue {
       }
   }
   uploadSuccess1(res){
-      console.log(res)
       let key = 'img'
       if (res.stffix == 'mp4') {
       key = 'video'
@@ -376,7 +375,6 @@ export default class MyEdit extends Vue {
       let BlockEmbed = Quill.import('blots/block/embed');
       class AudioBlot extends BlockEmbed {
           static create(value) {
-          console.log(value)
           let node = super.create();
           node.setAttribute('src', value.url);      //设置audio的src属性
           node.setAttribute('controls', true);      //设置audio的controls，否则他将不会显示
@@ -395,12 +393,13 @@ export default class MyEdit extends Vue {
 
   }
   pageChange(page){
-    console.log(page)
     this.getMaterialList(page)
   }
-  articleContent = ''
   mounted() {
     this.editorOption.initVoiceButton();
+    this.form = { ...this.$store.state.editorContent };
+    console.log('form:', this.form)
+    console.log('store:', this.$store.state.editorContent)
     if (this.$route.query.item) {
       this.form = JSON.parse(this.$route.query.item)
       this.imageUrl = this.form.articleVO?.articleCoverImagePath

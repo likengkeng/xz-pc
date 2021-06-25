@@ -42,7 +42,6 @@ import {apiUrl} from '@/pc/url.config.js'
   components:{MyList},
   watch: {
     '$route'(val, oldval){
-      console.log(val)
       this.type = val.meta.type
       this.getList()
     }
@@ -87,7 +86,7 @@ export default class MysevenGroup extends Vue {
     var d = time.getDate() < 10 ? `0${time.getDate()}` : time.getDate();
 
     var h = time.getHours() < 10 ? `0${time.getHours()}` : time.getHours();
-    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes(); 
+    var mm = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes();
     var s = time.getSeconds() < 10 ? `0${time.getSeconds()}` : time.getSeconds();
     return `${y}-${m}-${d} ${h}:${mm}:${s}`
   }
@@ -106,9 +105,9 @@ export default class MysevenGroup extends Vue {
         });
         this.getList()
       })
-    }).catch(() => {        
+    }).catch(() => {
     });
-    
+
   }
 
   handleAvatarSuccess(res, file) {
@@ -158,7 +157,7 @@ export default class MysevenGroup extends Vue {
       this.getList()
     })
   }
-  
+
   mounted() {
     // console.log(this.$route.meta.type)
     this.type = this.$route.meta.type
