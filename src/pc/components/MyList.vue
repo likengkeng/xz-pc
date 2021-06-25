@@ -68,9 +68,7 @@ export default class MyList extends Vue {
     this.$emit("del", item, index)
   }
   edit(item){
-    this.$store.commit('CHANGE_CONTENT', item);
-    this.$router.push({name: this.name, type: this.type, routerName: this.routerName})
-    // this.$emit("edit", item)
+    this.$router.push({name: this.name, query: {item: JSON.stringify(item)}, type: this.type, routerName: this.routerName})
   }
   add(){
     this.$router.push({name: this.name, query: {type: this.type, routerName: this.routerName}})
