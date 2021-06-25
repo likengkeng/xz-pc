@@ -66,7 +66,7 @@ export default class OrganizeWork extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      $http.powerDelete({prefaceId: item.prefaceId})
+      $http.powerDelete({prefaceId: item.organizationPowerId})
       .then(res => {
         this.$message({
           message: '删除成功',

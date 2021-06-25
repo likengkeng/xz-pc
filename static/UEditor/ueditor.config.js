@@ -302,12 +302,12 @@
 
         //autotypeset
         //自动排版参数
-        //,autotypeset: {
+        ,autotypeset: {
         //    mergeEmptyline: true,           //合并空行
         //    removeClass: true,              //去掉冗余的class
         //    removeEmptyline: false,         //去掉空行
         //    textAlign:"left",               //段落的排版方式，可以是 left,right,center,justify 去掉这个属性表示不执行排版
-        //    imageBlockLine: 'center',       //图片的浮动方式，独占一行剧中,左右浮动，默认: center,left,right,none 去掉这个属性表示不执行排版
+           imageBlockLine: 'center',       //图片的浮动方式，独占一行剧中,左右浮动，默认: center,left,right,none 去掉这个属性表示不执行排版
         //    pasteFilter: false,             //根据规则过滤没事粘贴进来的内容
         //    clearFontSize: false,           //去掉所有的内嵌字号，使用编辑器默认的字号
         //    clearFontFamily: false,         //去掉所有的内嵌字体，使用编辑器默认的字体
@@ -318,7 +318,7 @@
         //    indentValue : '2em',            //行首缩进的大小
         //    bdc2sb: false,
         //    tobdc: false
-        //}
+        }
 
         //tableDragable
         //表格是否可以拖拽
@@ -336,7 +336,7 @@
         //codeMirrorCssUrl css加载的路径，默认是 URL + "third-party/codemirror/codemirror.css"
         //,codeMirrorCssUrl:URL + "third-party/codemirror/codemirror.css"
         //编辑器初始化完成后是否进入源码模式，默认为否。
-        //,sourceEditorFirst:false
+        ,sourceEditorFirst:false
 
         //iframeUrlMap
         //dialog内容的路径 ～会被替换成URL,垓属性一旦打开，将覆盖所有的dialog的默认路径
@@ -358,7 +358,7 @@
 		// xss 过滤是否开启,inserthtml等操作
 		,xssFilterRules: true
 		//input xss过滤
-		,inputXssFilter: true
+		,inputXssFilter: false
 		//output xss过滤
 		,outputXssFilter: true
 		// xss过滤白名单 名单来源: https://raw.githubusercontent.com/leizongmin/js-xss/master/lib/default.js
@@ -425,7 +425,7 @@
 			tt:     [],
 			u:      [],
 			ul:     ['class', 'style'],
-			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style']
+			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style','id']
 		}
     };
 

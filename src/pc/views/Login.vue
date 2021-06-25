@@ -2,7 +2,7 @@
   <div class="login flex al_center jc_center">
     <div class='flex'>
       <div class='left'>
-        西藏组织工作成就展CMS系统
+        <img :src="cms" alt="" class='cms'>
       </div>
       <div class='right'>
         <div class='text_center mb_37 size_18'>登录</div>
@@ -26,9 +26,11 @@
 import Vue from 'vue';
 import $http from '@/pc/api/event';
 import Component from 'vue-class-component';
+import cms from '../../images/cms.png'
 @Component({
 })
 export default class Login extends Vue {
+  cms = cms
   form: any = {
     name: '', password: ''
   }
@@ -77,10 +79,14 @@ export default class Login extends Vue {
     height: 100vh;
     background: url('@/images/login-background.png') no-repeat;
     background-size:100% 100%;
+    .cms{
+      width: 100%;
+      height: 100%;
+    }
     .left{
       width: 350px;
       height: 466px;
-      padding-top: 70px;
+      // padding-top: 70px;
       text-align: center;
       box-sizing: border-box;
       color: #fff;

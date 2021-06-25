@@ -140,8 +140,8 @@ const http = {
   },
   //  组织工作||榜样力量删除
   powerDelete: (data: any) => {
-    const url = `organization/power/delete`
-    return apiCreator().post(url, data);
+    const url = `organization/power/delete?prefaceId=${data.prefaceId}`
+    return apiCreator().get(url);
   },
   
   // 七地
@@ -161,8 +161,8 @@ const http = {
   },
   // 七地
   voiceDelete: (data: any) => {
-    const url = `area/voice/delete`
-    return apiCreator().post(url, data);
+    const url = `area/voice/delete?areaVoiceId=${data.areaVoiceId}`
+    return apiCreator().get(url);
   },
 
   // 评论

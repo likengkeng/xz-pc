@@ -132,25 +132,26 @@ export default class BigEventEdit extends Vue {
       key: Date.now()
     });
   }
-  remove(item, index){
-    if (index !== -1) {
-      this.form.domains.splice(index, 1)
-    }
+  remove(file, fileList){
+    this.fileList = fileList
+    // if (index !== -1) {
+    //   this.form.domains.splice(index, 1)
+    // }
   }
   onchang(file, fileList){
     this.fileList = fileList
   }
-  remove(file, fileList){
-    this.fileList = []
-    fileList.forEach(el => {
-      if (el.response?.data?.path) {
-        list.push(el.response.data.pathAll)
-        let obj = new Object();
-          obj.url = el.response.data.pathAll;
-          this.fileList.push(obj);
-      }
-    })
-  }
+  // remove(file, fileList){
+  //   this.fileList = []
+  //   fileList.forEach(el => {
+  //     if (el.response?.data?.path) {
+  //       list.push(el.response.data.pathAll)
+  //       let obj = new Object();
+  //         obj.url = el.response.data.pathAll;
+  //         this.fileList.push(obj);
+  //     }
+  //   })
+  // }
   preview(){
   }
   cancel(){

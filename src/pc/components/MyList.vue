@@ -82,18 +82,18 @@ export default class MyList extends Vue {
       margin-top: 10px;
     }
     .list{
-      width: 23%;
-      margin: 0px 1% 28px;
+      width: 266px;
+      margin: 0px 10px 28px;
       min-height: 200px;
       box-sizing: border-box;
       .img{
-        width: 100%;
+        width: 266px;
         height: 118px;
         display: block;
         margin-bottom: 7px;
         background-color: #ccc;
         img{
-          width: 100%;
+          width: 266px;
           height: 100%;
           display: block;
         }

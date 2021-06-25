@@ -198,6 +198,7 @@
     
     uploadSuccess(res){
       console.log(res)
+      this.fileList = []
       this.$emit("uploadSuccess", res)
     }
   }

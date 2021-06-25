@@ -77,20 +77,25 @@
         <el-checkbox-group v-model="dialogCheckList" class='flex wrap'>
           <div v-for='(item, index) in list' :key='index' class='dialog_list'>
             <el-checkbox :label="item" class='pr'>
-              <video :src="item.pathAl" class='dialog_video' v-if='dialogType==3'>
+              <video :src="item.pathAll" class='dialog_video' v-if='dialogType==1'>
                 您的浏览器不支持 video 标签。
               </video>
               <audio :src="item.pathAll" controls class='dialog_video' v-if='dialogType==2'>
                 您的浏览器不支持 audio 标签。
               </audio>
-              <img :src='item.pathAll' class='dialog_video' v-if='dialogType==1' />
+              <img :src='item.pathAll' class='dialog_video' v-if='dialogType==3' />
 
-              <div>{{item.name}}</div>
+              <div class='line_clamp1 dialog_video_name'>{{item.name}}</div>
             </el-checkbox>
           </div>
         </el-checkbox-group>
       </div>
       <div slot="footer" class="dialog-footer">
+        <el-pagination
+          layout="prev, pager, next"
+          :total="total"
+          @current-change="pageChange">
+        </el-pagination>
         <el-button @click="isShow = false">取 消</el-button>
         <el-button type="primary" @click="dialogConfirm">确 定</el-button>
       </div>
@@ -303,6 +308,7 @@ export default class MyEdit extends Vue {
     this.dialogCheckList.forEach(el => {
       this.uploadSuccess(el)
     })
+    this.dialogCheckList = []
     this.isShow = false
   }
   material(index){
@@ -310,12 +316,16 @@ export default class MyEdit extends Vue {
     this.isShow=true
     this.getMaterialList()
   }
-  getMaterialList(){
-    $http.materialListType({
-      type: this.dialogType
+  total = 1
+  getMaterialList(page=1){
+    $http.materialList({
+      type: this.dialogType,
+      page_index: page,
+      page_size: 12,
     })
     .then(res => {
-      this.list = res.data
+      this.list = res.data.data
+      this.total = res.data.totalElements
     })
   }
   changefile(e){
@@ -384,6 +394,11 @@ export default class MyEdit extends Vue {
       quill.setSelection(length + 1);  //光标位置向后移动一位
 
   }
+  pageChange(page){
+    console.log(page)
+    this.getMaterialList(page)
+  }
+  articleContent = ''
   mounted() {
     this.editorOption.initVoiceButton();
     if (this.$route.query.item) {
@@ -391,7 +406,6 @@ export default class MyEdit extends Vue {
       this.imageUrl = this.form.articleVO?.articleCoverImagePath
       this.isEdit = true
     }
-    console.log(this.form)
   }
 }
 </script>
@@ -451,5 +465,11 @@ export default class MyEdit extends Vue {
   }
   .dialog_list{
     margin: 0px 10px 10px 0px;
+  }
+  .dialog_video{
+    width: 176px;height:100px;display:block;
+  }
+  .dialog_video_name{
+    width: 176px;
   }
 </style>
