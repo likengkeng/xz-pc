@@ -397,11 +397,9 @@ export default class MyEdit extends Vue {
   }
   mounted() {
     this.editorOption.initVoiceButton();
-    if (this.$route.query.item) {
-      this.form = JSON.parse(this.$route.query.item)
-      this.imageUrl = this.form.articleVO?.articleCoverImagePath
-      this.isEdit = true
-    }
+    this.form = this.$store.state.content;
+    this.imageUrl = this.form.articleVO?.articleCoverImagePath
+    this.isEdit = true
   }
 }
 </script>

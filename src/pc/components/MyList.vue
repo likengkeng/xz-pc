@@ -12,7 +12,9 @@
         <div class='list_content'>
           <div>
             <div class='title size_16 bold mb_7 line_clamp1'>{{(item.articleVO||{}).articleTitle}}</div>
-            <div class='line_clamp4 articleContent' v-html='(item.articleVO||{}).articleContent'></div>
+            <div class='line_clamp4 articleContent'>
+              {{ delHtmlTag((item.articleVO||{}).articleContent) }}
+            </div>
           </div>
           <div class='color_666 updata_time'>更新于{{(item.articleVO||{}).createDatetime}}</div>
         </div>
@@ -47,6 +49,10 @@ import Component from 'vue-class-component';
 })
 export default class MyList extends Vue {
 
+  delHtmlTag(str) {
+    return str?.replace(/<[^>]+>/g,"")
+  }
+
   handleClick(){
   }
 
@@ -62,7 +68,8 @@ export default class MyList extends Vue {
     this.$emit("del", item, index)
   }
   edit(item){
-    this.$router.push({name: this.name, query: {item: JSON.stringify(item)}, type: this.type, routerName: this.routerName})
+    this.$store.commit('CHANGE_CONTENT', item);
+    this.$router.push({name: this.name, type: this.type, routerName: this.routerName})
     // this.$emit("edit", item)
   }
   add(){
